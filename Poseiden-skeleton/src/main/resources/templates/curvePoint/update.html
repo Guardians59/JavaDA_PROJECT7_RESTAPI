@@ -5,18 +5,58 @@
 <meta charset="utf-8"/>
 <title>Home</title>
 <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+<link rel="stylesheet" href="../../css/update.css" >
 </head>
 <body>
 <div class="container">
 	<div class="row">
 		<h2>Update CurvePoint</h2>
 	</div>
+	</div>
 
+	<div class="container">
 	<div class="row">
-		<form action="#" th:action="@{/curvePoint/update/{id}(id=${curvePoint.id})}" th:object="${curvePoint}" method="post" class="form-horizontal" style="width: 100%">
+		<form action="#" th:action="@{/curvePoint/update/{id}(id=${curvePoint.id})}" th:object="${curvePoint}" method="post" 
+			class="form-horizontal" style="width: 100%">
 			<!--
 			TODO: Create a form to edit the values of CurvePoint, there are 2 buttons: Update data and Cancel to the Curve Point
 			 -->
+			  <div th:if="${updateError}">
+				<p style="color: red;" th:text="${updateError}" align="center"></p>
+		     </div>
+			 <div class="form-group">
+			 <label for="account">Curve Id</label>
+			 <div class="input-group">
+			 <input type="number" th:field="*{curveId}" class="form-control"
+					placeholder="Curve Id" aria-label="number"
+					aria-describedby="addon-wrapping">
+			 </div>
+			 </div>
+			 
+			 <div class="form-group">
+			 <label for="account">Term</label>
+			 <div class="input-group">
+			 <input type="number" th:field="*{term}" class="form-control"
+					placeholder="Term" aria-label="number"
+					aria-describedby="addon-wrapping">
+			 </div>
+			 </div>
+			 
+			 <div class="form-group">
+			 <label for="account">Value</label>
+			 <div class="input-group">
+			 <input type="number" th:field="*{value}"
+					class="form-control number-custom" placeholder="Value"
+					aria-label="number" aria-describedby="addon-wrapping">
+			 </div>
+			 </div>
+			 
+			 <div class="row">
+			 <a href="/curvePoint/list">
+			 <button type="button" class="btn btn-danger cancel-button">Cancel</button>
+			 </a>
+			 <button type="submit" class="btn btn-primary update-button">Update CurvePoint</button>
+			 </div>
 		</form>
 	</div>
 

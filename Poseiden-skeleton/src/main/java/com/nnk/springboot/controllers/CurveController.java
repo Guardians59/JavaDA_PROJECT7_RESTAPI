@@ -1,6 +1,9 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.services.ICurvePointService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,46 +12,110 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 
 @Controller
 public class CurveController {
-    // TODO: Inject Curve Point service
+    
+    @Autowired
+    ICurvePointService curvePointService;
 
     @RequestMapping("/curvePoint/list")
     public String home(Model model)
     {
         // TODO: find all Curve Point, add to model
+	List<CurvePoint> curvePointList = new ArrayList<>();
+	curvePointList = curvePointService.getAllCurvePoint();
+	model.addAttribute("curvePoint", curvePointList);
         return "curvePoint/list";
     }
 
     @GetMapping("/curvePoint/add")
-    public String addBidForm(CurvePoint bid) {
+    public String addBidForm(Model model) {
+	CurvePoint curvePoint = new CurvePoint();
+	model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/add";
     }
 
     @PostMapping("/curvePoint/validate")
     public String validate(@Valid CurvePoint curvePoint, BindingResult result, Model model) {
         // TODO: check data valid and save to db, after saving return Curve list
-        return "curvePoint/add";
+	boolean resultAdd;
+	resultAdd = curvePointService.addCurvePoint(curvePoint);
+	
+	if(result.hasErrors()) {
+	    CurvePoint newCurvePoint = new CurvePoint();
+	    model.addAttribute("curvePoint", newCurvePoint);
+	    return "curvePoint/add";
+	} else if (resultAdd == true) {
+	    List<CurvePoint> curvePointList = new ArrayList<>();
+	    curvePointList = curvePointService.getAllCurvePoint();
+	    model.addAttribute("curvePoint", curvePointList);
+	    model.addAttribute("success", "Successful curve addition");
+	    return "curvePoint/list";
+	} else {
+	    model.addAttribute("error", "An error has occured please try again");
+	    return "curvePoint/add";
+	}
     }
 
-    @GetMapping("/curvePoint/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
+    @GetMapping("/curvePoint/edit/{id}")
+    public String showUpdateForm(@PathVariable("id") int id, Model model) {
         // TODO: get CurvePoint by Id and to model then show to the form
+	CurvePoint curvePoint = new CurvePoint();
+	curvePoint = curvePointService.getCurvePointById(id);
+	model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/update";
     }
 
     @PostMapping("/curvePoint/update/{id}")
-    public String updateBid(@PathVariable("id") Integer id, @Valid CurvePoint curvePoint,
+    public String updateBid(@PathVariable("id") int id, @Valid CurvePoint curvePoint,
                              BindingResult result, Model model) {
         // TODO: check required fields, if valid call service to update Curve and return Curve list
-        return "redirect:/curvePoint/list";
+        boolean resultUpdate;
+        resultUpdate = curvePointService.updateCurvePoint(id, curvePoint);
+        
+        if (result.hasErrors()) {
+            CurvePoint curvePointModel = curvePointService.getCurvePointById(id);
+            model.addAttribute("curvePoint", curvePointModel);
+            return "curvePoint/update";  
+        } else if (resultUpdate == true) {
+            List<CurvePoint> curvePointList = new ArrayList<>();
+            curvePointList = curvePointService.getAllCurvePoint();
+            model.addAttribute("curvePoint", curvePointList);
+            model.addAttribute("updateSuccess", "The update was executed successfully");
+            return "curvePoint/list";
+        } else {
+            CurvePoint curvePointModel = curvePointService.getCurvePointById(id);
+            model.addAttribute("curvePoint", curvePointModel);
+            model.addAttribute("updateError", "An error has occured please try again");
+            return "curvePoint/list";
+        }
+	
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, Model model) {
+    public String deleteBid(@PathVariable("id") int id, Model model) {
         // TODO: Find Curve by Id and delete the Curve, return to Curve list
-        return "redirect:/curvePoint/list";
+	boolean resultDelete;
+	resultDelete = curvePointService.deleteCurvePoint(id);
+
+	if (resultDelete == true) {
+	    List<CurvePoint> curvePoint = new ArrayList<>();
+	    curvePoint = curvePointService.getAllCurvePoint();
+	    model.addAttribute("curvePoint", curvePoint);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    return "/curvePoint/list";
+	} else {
+	    List<CurvePoint> curvePoint = new ArrayList<>();
+	    curvePoint = curvePointService.getAllCurvePoint();
+	    model.addAttribute("bidList", curvePoint);
+	    model.addAttribute("deleteError", "An error has occured please try again");
+	    return "/curvePoint/list";
+	}
+        
     }
 }

@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <title>Home</title>
 <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+<link rel="stylesheet" href="../../css/list.css" >
 </head>
 <body>
 <div class="container">
@@ -25,19 +26,49 @@
 	</div>
 	<div class="row"><h2>Curve Point List</h2></div>
 	<div class="row">
-		<a href="/curvePoint/add" class="btn btn-primary btn-sm">Add New</a>
-		<table class="table table-bordered">
+		<a href="/curvePoint/add" class="btn btn-primary btn-sm btn-add-new">Add New</a>
+	</div>
+	<div class="col-12">
+		<div th:if="${success}">
+				<p style="color: green;" th:text="${success}" align="center"></p>
+		</div>
+		<div th:if="${updateSuccess}">
+				<p style="color: green;" th:text="${updateSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteSuccess}">
+				<p style="color: green;" th:text="${deleteSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteError}">
+				<p style="color: green;" th:text="${deleteError}" align="center"></p>
+		</div>
+		</div>
+		<div class="row">
+		<table class="table table-bordered text-center" th:object=${curvePoint}>
 			<thead>
 				<tr>
-					<th>Id</th>
-					<th>CurvePointId</th>
-					<th>Term</th>
-					<th>Value</th>
-					<th>Action</th>
+					<th scope="col">Id</th>
+					<th scope="col">CurvePointId</th>
+					<th scope="col">Term</th>
+					<th scope="col">Value</th>
+					<th scope="col">Action</th>
 				</tr>
 			</thead>
 			<tbody>
 			<!-- TODO: Show all CurvePoint to the table, the action column will have Edit & Delete buttons -->
+				<tr th:each="c : ${curvePoint}">
+					<th scope="row" th:text="${c.id}"></th>
+					<td th:text="${c.curveId}"></td>
+					<td th:text="${c.term}"></td>
+					<td th:text="${c.value}"></td>
+					<td>
+					<a th:href="@{/curvePoint/edit/{id}(id=${c.id})}">
+					<button type="button" class="btn btn-primary">Edit</button>
+					</a>
+					<a th:href="@{/curvePoint/delete/{id}(id=${c.id})}">
+					<button type="button" class="btn btn-danger">Delete</button>
+					</a>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>

@@ -1,27 +1,67 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" 
-	  xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8" />
 <title>Home</title>
-<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+<link rel="stylesheet" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/add.css">
 </head>
 <body>
-<div class="container">
+	<div class="container">
 
-	<div class="row">
-		<h2>Add New Curve Point</h2>
-	</div>
+		<div class="row">
+			<h2>Add New Curve Point</h2>
+		</div>
 
-	<div class="row">
-		<form action="#" th:action="@{/curvePoint/validate}" th:object="${curvePoint}" method="post" class="form-horizontal" style="width: 100%">
-			<!--
+		<div class="row">
+			<form action="#" th:action="@{/curvePoint/validate}"
+				th:object="${curvePoint}" method="post" class="form-horizontal"
+				style="width: 100%">
+				<!--
 			TODO: Create a form to input the values of CurvePoint, there are 2 buttons: Save data and Cancel to the list CurvePoint
 			 -->
+				<div th:if="${error}">
+					<p style="color: red;" th:text="${error}" align="center"></p>
+				</div>
+				<div class="form-group">
+					<label for="account">Curve Id</label>
+					<div class="input-group">
+						<input type="number" th:field="*{curveId}" class="form-control"
+							placeholder="Curve Id" aria-label="number"
+							aria-describedby="addon-wrapping">
+					</div>
+				</div>
 
-		</form>
+				<div class="form-group">
+					<label for="account">Term</label>
+					<div class="input-group">
+						<input type="number" th:field="*{term}" class="form-control"
+							placeholder="Term" aria-label="number"
+							aria-describedby="addon-wrapping">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="account">Value</label>
+					<div class="input-group">
+						<input type="number" th:field="*{value}"
+							class="form-control number-custom" placeholder="Value"
+							aria-label="number" aria-describedby="addon-wrapping">
+					</div>
+				</div>
+
+				<div class="row">
+					<a href="/curvePoint/list">
+						<button type="button" class="btn btn-danger cancel-button">Cancel</button>
+					</a>
+					<button type="submit" class="btn btn-primary add-button">Add
+						CurvePoint</button>
+				</div>
+
+			</form>
+		</div>
+
 	</div>
-
-</div>
 </body>
 </html>
