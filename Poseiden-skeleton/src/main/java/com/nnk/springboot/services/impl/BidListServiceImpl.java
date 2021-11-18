@@ -86,10 +86,10 @@ public class BidListServiceImpl implements IBidListService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean deleteBidList(int id) {
 	boolean result = false;
-	BidList bidListDelete = new BidList();
-	bidListDelete = bidListRepository.getById(id);
+	Optional<BidList> bidListDelete;
+	bidListDelete = bidListRepository.findById(id);
 	
-	if (bidListDelete != null) {
+	if (bidListDelete.isPresent()) {
 	    bidListRepository.deleteById(id);
 	    result = true;
 	    logger.info("The bidList with id number " + id + " has been deleted correctly");
@@ -104,12 +104,13 @@ public class BidListServiceImpl implements IBidListService {
     public BidList getBidById(int id) {
 	Optional<BidList> bidListUpdate;
 	bidListUpdate = bidListRepository.findById(id);
-	BidList bidList = bidListUpdate.get();
+	BidList bidList = new BidList();
 	
-	if(bidList == null) {
+	if(!bidListUpdate.isPresent()) {
 	    logger.error("No bidList found with id number " + id);
 	} else {
 	    logger.info("The bidList with id number " + id + " successfully recovered");
+	    bidList = bidListUpdate.get();
 	}
 	return bidList;
     }
