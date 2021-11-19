@@ -2,19 +2,19 @@ package com.nnk.springboot.repositories;
 
 import com.nnk.springboot.domain.BidList;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@TestMethodOrder(OrderAnnotation.class)
 public class BidListRepositoryTests {
 
     @Autowired
@@ -38,6 +38,7 @@ public class BidListRepositoryTests {
      * assertFalse(bidList.isPresent()); }
      */
     @Test
+    @Order(1)
     public void getListAllBidTest() {
 	// WHEN
 	List<BidList> listResult = bidListRepository.findAll();
@@ -47,6 +48,7 @@ public class BidListRepositoryTests {
     }
 
     @Test
+    @Order(2)
     public void saveAndUpdateBidTest() {
 	// GIVEN
 	BidList newBidList = new BidList();
@@ -77,6 +79,7 @@ public class BidListRepositoryTests {
     }
 
     @Test
+    @Order(3)
     public void deleteBidTest() {
 	// GIVEN
 	BidList bidListDelete = new BidList();
