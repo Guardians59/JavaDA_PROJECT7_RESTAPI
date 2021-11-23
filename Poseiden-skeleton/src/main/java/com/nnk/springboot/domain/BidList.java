@@ -21,7 +21,7 @@ public class BidList {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "bid_quatity")
+    @Column(name = "bid_quantity")
     private Double bidQuantity;
 
     @Column(name = "ask_quantity")
