@@ -155,7 +155,7 @@ public class CurvePointServiceTests {
 	//GIVEN
 	CurvePoint curvePoint = new CurvePoint();
 	//WHEN
-	curvePoint = curvePointService.getCurvePointById(4);
+	curvePoint = curvePointService.getCurvePointById(12);
 	//THEN
 	assertEquals(curvePoint.getCurveId(), 12);
     }

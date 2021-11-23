@@ -1,5 +1,6 @@
 package com.nnk.springboot.services.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,8 @@ public class BidListServiceImpl implements IBidListService {
 	    bidListAdd.setAccount(newBidList.getAccount());
 	    bidListAdd.setType(newBidList.getType());
 	    bidListAdd.setBidQuantity(newBidList.getBidQuantity());
+	    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+	    bidListAdd.setCreationDate(timestamp);
 	    bidListRepository.save(bidListAdd);
 	    result = true;
 	    logger.info("The new bidList is registered successfully");
@@ -68,6 +71,8 @@ public class BidListServiceImpl implements IBidListService {
 		bidListUpdate.setAccount(bidList.getAccount());
 		bidListUpdate.setType(bidList.getType());
 		bidListUpdate.setBidQuantity(bidList.getBidQuantity());
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		bidListUpdate.setRevisionDate(timestamp);
 		bidListRepository.save(bidListUpdate);
 		result = true;
 		logger.info("Updated bidList with id number " + id + " successfully");

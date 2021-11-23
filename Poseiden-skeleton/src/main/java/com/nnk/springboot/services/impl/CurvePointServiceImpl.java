@@ -1,5 +1,6 @@
 package com.nnk.springboot.services.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,8 @@ public class CurvePointServiceImpl implements ICurvePointService {
 	    curvePoint.setCurveId(newCurvePoint.getCurveId());
 	    curvePoint.setTerm(newCurvePoint.getTerm());
 	    curvePoint.setValue(newCurvePoint.getValue());
+	    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+	    curvePoint.setCreationDate(timestamp);
 	    curvePointRepository.save(curvePoint);
 	    result = true;
 	    logger.info("The new curvePoint is registered successfully");

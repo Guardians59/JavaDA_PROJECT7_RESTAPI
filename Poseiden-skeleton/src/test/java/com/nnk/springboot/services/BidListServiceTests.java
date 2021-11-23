@@ -153,7 +153,7 @@ public class BidListServiceTests {
 	//GIVEN
 	BidList bidList = new BidList();
 	//WHEN
-	bidList = bidListService.getBidById(1);
+	bidList = bidListService.getBidById(20);
 	//THEN
 	assertEquals(bidList.getAccount(), "user");
     }
