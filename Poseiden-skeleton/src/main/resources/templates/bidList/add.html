@@ -29,6 +29,8 @@
 					placeholder="Account" aria-label="text"
 					aria-describedby="addon-wrapping">
 			 </div>
+			 <p th:if="${#fields.hasErrors('account')}" th:class="${#fields.hasErrors('account')}? error">
+			 Account is mandatory </p>
 			 </div>
 			 
 			 <div class="form-group">
@@ -38,6 +40,8 @@
 					placeholder="Type" aria-label="text"
 					aria-describedby="addon-wrapping">
 			 </div>
+			 <p th:if="${#fields.hasErrors('type')}" th:class="${#fields.hasErrors('type')}? error">
+			 Type is mandatory </p>
 			 </div>
 			 
 			 <div class="form-group">

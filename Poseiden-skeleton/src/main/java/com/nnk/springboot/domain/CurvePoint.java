@@ -2,6 +2,8 @@ package com.nnk.springboot.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -13,7 +15,7 @@ public class CurvePoint {
     @Column(name = "id")
     private int id;
 
-    @NotNull(message = "Must not be null")
+    @Positive(message = "Must not be null")
     @Column(name = "curve_id")
     private int curveId;
 

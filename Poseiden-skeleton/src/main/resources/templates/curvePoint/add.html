@@ -31,6 +31,9 @@
 							placeholder="Curve Id" aria-label="number"
 							aria-describedby="addon-wrapping">
 					</div>
+					<p th:if="${#fields.hasErrors('curveId')}"
+						th:class="${#fields.hasErrors('curveId')}? error">Must not be
+						null</p>
 				</div>
 
 				<div class="form-group">

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,14 +42,12 @@ public class BidListController {
     }
 
     @PostMapping("/bidList/validate")
-    public String validate(@Valid BidList bid, BindingResult result, Model model) {
+    public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Model model) {
 	// TODO: check data valid and save to db, after saving return bid list
 	boolean resultAdd;
 	resultAdd = bidListService.addBidList(bid);
 
 	if (result.hasErrors()) {
-	    BidList bidList = new BidList();
-	    model.addAttribute("bidList", bidList);
 	    return "bidList/add";
 	} else if (resultAdd == true) {
 	    List<BidList> bidList = new ArrayList<>();
@@ -57,7 +56,8 @@ public class BidListController {
 	    model.addAttribute("success", "Successful bid addition");
 	    return "bidList/list";
 	} else {
-	    model.addAttribute("error", "An error has occured please try again");
+	    model.addAttribute("error",
+		    "An error has occured, check that you have filled in all the information fields and try again");
 	    return "bidList/add";
 	}
     }
@@ -71,16 +71,14 @@ public class BidListController {
     }
 
     @PostMapping("/bidList/update/{bidListId}")
-    public String updateBid(@PathVariable("bidListId") int id, @Valid BidList bidList, BindingResult result,
-	    Model model) {
+    public String updateBid(@PathVariable("bidListId") int id, @ModelAttribute("bidList") @Valid BidList bidList,
+	    BindingResult result, Model model) {
 	// TODO: check required fields, if valid call service to update Bid and return
 	// list Bid
 	boolean resultUpdate;
 	resultUpdate = bidListService.updateBidList(id, bidList);
 
 	if (result.hasErrors()) {
-	    BidList bidListModel = bidListService.getBidById(id);
-	    model.addAttribute("bidList", bidListModel);
 	    return "bidList/update";
 	} else if (resultUpdate == true) {
 	    List<BidList> listBidList = new ArrayList<>();
@@ -91,7 +89,8 @@ public class BidListController {
 	} else {
 	    BidList bidListModel = bidListService.getBidById(id);
 	    model.addAttribute("bidList", bidListModel);
-	    model.addAttribute("updateError", "An error has occured please try again");
+	    model.addAttribute("updateError",
+		    "An error has occured, check that you have filled in all the information fields and try again");
 	    return "bidList/update";
 	}
 

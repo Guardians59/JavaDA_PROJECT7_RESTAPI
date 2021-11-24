@@ -5,3 +5,7 @@
 .add-button {
 	margin-left: 10px;
 }
+
+.error {
+	color: red;
+}
