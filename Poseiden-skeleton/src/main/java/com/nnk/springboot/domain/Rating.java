@@ -1,9 +1,8 @@
 package com.nnk.springboot.domain;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import javax.validation.constraints.Positive;
+
 
 @Entity
 @Table(name = "rating")
@@ -23,6 +22,7 @@ public class Rating {
     @Column(name = "fitch_rating")
     private String fitchRating;
 
+    @Positive(message = "The order number must be greater than zero")
     @Column(name = "order_number")
     private int orderNumber;
 
