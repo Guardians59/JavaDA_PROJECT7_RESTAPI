@@ -2,6 +2,8 @@ package com.nnk.springboot.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -13,12 +15,15 @@ public class Trade {
     @Column(name = "trade_id")
     private int tradeId;
 
+    @NotBlank
     @Column(name = "account")
     private String account;
 
+    @NotBlank
     @Column(name = "type")
     private String type;
 
+    @Positive
     @Column(name = "buy_quantity")
     private Double buyQuantity;
 

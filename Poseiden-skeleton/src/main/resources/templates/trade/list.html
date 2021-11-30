@@ -5,11 +5,12 @@
 <meta charset="utf-8"/>
 <title>Home</title>
 <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+<link rel="stylesheet" href="../../css/list.css" >
 </head>
 <body>
 <div class="container">
 	<div class="row">
-		<div class="col-6">
+		<div class="col-6 nav-list">
 			<a href="/bidList/list">Bid List</a>&nbsp;|&nbsp;
 			<a href="/curvePoint/list">Curve Points</a>&nbsp;|&nbsp;
 			<a href="/rating/list">Ratings</a>&nbsp;|&nbsp;
@@ -25,8 +26,24 @@
 	</div>
 	<div class="row"><h2>Trade List</h2></div>
 	<div class="row">
-		<a href="/trade/add" class="btn btn-primary btn-sm">Add New</a>
-		<table class="table table-bordered">
+		<a href="/trade/add" class="btn btn-primary btn-sm btn-add-new">Add New</a>
+	</div>
+		<div class="col-12">
+		<div th:if="${success}">
+				<p style="color: green;" th:text="${success}" align="center"></p>
+		</div>
+		<div th:if="${updateSuccess}">
+				<p style="color: green;" th:text="${updateSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteSuccess}">
+				<p style="color: green;" th:text="${deleteSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteError}">
+				<p style="color: green;" th:text="${deleteError}" align="center"></p>
+		</div>
+		</div>
+		<div class="row">
+		<table class="table table-bordered text-center" th:object=${trade}>
 			<thead>
 				<tr>
 					<th>Id</th>
@@ -38,6 +55,20 @@
 			</thead>
 			<tbody>
 			<!-- TODO: Show all Trade to the table, the Action column will have Edit & Delete buttons -->
+			<tr th:each="t : ${trade}">
+						<th scope="row" th:text="${t.tradeId}"></th>
+						<td th:text="${t.account}"></td>
+						<td th:text="${t.type}"></td>
+						<td th:text="${t.buyQuantity}"></td>
+						<td>
+						<a th:href="@{/trade/edit/{id}(id=${t.tradeId})}">
+						<button type="button" class="btn btn-primary">Edit</button>
+						</a>
+						<a th:href="@{/trade/delete/{id}(id=${t.tradeId})}">
+						<button type="button" class="btn btn-danger">Delete</button>
+						</a>
+						</td>
+					</tr>
 			</tbody>
 		</table>
 	</div>
