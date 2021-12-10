@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <title>Home</title>
 <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/list.css" >
 </head>
 <body>
 <div class="container">
@@ -18,8 +19,24 @@
 	</div>
 	<div class="row"><h2>User List</h2></div>
 	<div class="row">
-		<a href="/user/add" class="btn btn-primary btn-sm">Add New</a>
-		<table class="table table-bordered">
+		<a href="/user/add" class="btn btn-primary btn-sm btn-add-new">Add New</a>
+	</div>
+		<div class="col-12">
+		<div th:if="${success}">
+				<p style="color: green;" th:text="${success}" align="center"></p>
+		</div>
+		<div th:if="${updateSuccess}">
+				<p style="color: green;" th:text="${updateSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteSuccess}">
+				<p style="color: green;" th:text="${deleteSuccess}" align="center"></p>
+		</div>
+		<div th:if="${deleteError}">
+				<p style="color: red;" th:text="${deleteError}" align="center"></p>
+		</div>
+		</div>
+		<div class="row">
+		<table class="table table-bordered text-center" th:object=${user}>
 			<thead>
 				<tr>
 					<th>Id</th>
@@ -30,15 +47,19 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="user : ${users}">
-					<td style="width: 10%" th:text="${user.id}"></td>
-					<td th:text="${user.fullname}"></td>
-					<td th:text="${user.username}"></td>
-					<td style="width: 25%" th:text="${user.role}"></td>
-					<td style="width: 15%" class="text-center">
-						<a th:href="@{/user/update/{id}(id=${user.id})}">Edit</a>&nbsp;|&nbsp;
-						<a th:href="@{/user/delete/{id}(id=${user.id})}">Delete</a>
-					</td>
+				<tr th:each="u : ${user}">
+				<th scope="row" th:text="${u.id}"></th>
+						<td th:text="${u.fullname}"></td>
+						<td th:text="${u.username}"></td>
+						<td th:text="${u.role.displayValue}"></td>
+						<td>
+						<a th:href="@{/user/edit/{id}(id=${u.id})}">
+						<button type="button" class="btn btn-primary">Edit</button>
+						</a>
+						<a th:href="@{/user/delete/{id}(id=${u.id})}">
+						<button type="button" class="btn btn-danger">Delete</button>
+						</a>
+						</td>
 				</tr>
 			</tbody>
 		</table>

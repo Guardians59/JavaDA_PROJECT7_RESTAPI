@@ -2,6 +2,7 @@ package com.nnk.springboot.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "user")
@@ -15,27 +16,26 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    @NotBlank(message = "Password is mandatory")
-    @Column(name = "password")
+    /*@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+	    message = "Le mot de passe doit contenir un minimum de 8 caractères, dont un chiffre, une majuscule et un symbole")
+   */ @Column(name = "password")
     private String password;
 
     @NotBlank(message = "FullName is mandatory")
     @Column(name = "fullname")
     private String fullname;
 
-    @NotBlank(message = "Role is mandatory")
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public User() {
 
     }
 
-    public User(Integer id, @NotBlank(message = "Username is mandatory") String username,
-	    @NotBlank(message = "Password is mandatory") String password,
-	    @NotBlank(message = "FullName is mandatory") String fullname,
-	    @NotBlank(message = "Role is mandatory") String role) {
-
+    public User(Integer id, @NotBlank(message = "Username is mandatory") String username, String password,
+	    @NotBlank(message = "FullName is mandatory") String fullname, Role role) {
+	super();
 	this.id = id;
 	this.username = username;
 	this.password = password;
@@ -75,11 +75,12 @@ public class User {
 	this.fullname = fullname;
     }
 
-    public String getRole() {
+    public Role getRole() {
 	return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
 	this.role = role;
     }
+
 }

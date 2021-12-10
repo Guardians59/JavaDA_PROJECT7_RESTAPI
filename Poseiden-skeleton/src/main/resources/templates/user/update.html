@@ -5,6 +5,7 @@
 	<meta charset="utf-8"/>
 	<title>Home</title>
 	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+	<link rel="stylesheet" href="../../css/update.css" >
 </head>
 <body>
 <div class="container">
@@ -12,9 +13,14 @@
 	<div class="row">
 		<h2>Update User</h2>
 	</div>
+	</div>
 
+	<div class="container">
 	<div class="row">
 		<form action="#" th:action="@{/user/update/{id}(id=${user.id})}" th:object="${user}" method="post" class="form-horizontal" style="width: 100%">
+			<div th:if="${updateError}">
+				<p style="color: red;" th:text="${updateError}" align="center"></p>
+		     </div>
 			<div class="form-group">
 				<label for="fullname" class="col-sm-2 control-label">Full Name</label>
 				<div class="col-sm-10">
@@ -33,23 +39,30 @@
 				<label for="password" class="col-sm-2 control-label">Password</label>
 				<div class="col-sm-10">
 					<input type="password" th:field="*{password}" id="password" placeholder="Password" class="col-4">
-					<p class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+				</div>
+				<div th:if="${errorPassword}">
+						<p style="color: red;" th:text="${errorPassword}"></p>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="password" class="col-sm-2 control-label">Role</label>
 				<div class="col-sm-10">
-					<label class="checkbox-inline"><input type="radio" th:field="*{role}" th:value="ADMIN">Admin</label>
-					<label class="checkbox-inline"><input type="radio" th:field="*{role}" th:value="USER">User</label>
+				<select th:field="*{role}" class="form-select col-sm-4">
+
+					<option
+						th:each="roleOpt : ${T(com.nnk.springboot.domain.Role).values()}"
+						th:value="${roleOpt}" th:text="${roleOpt.displayValue}"></option>
+				</select>
 				</div>
 			</div>
 
 
 			<div class="form-group">
 				<div class="col-sm-12">
-					<input type="hidden" th:field="*{id}">
-					<a class="btn btn-danger btn-sm" href="/user/list">Cancel</a>
-					<input class="btn btn-primary btn-sm" type="submit" value="Update User">
+				<a href="/user/list">
+						<button type="button" class="btn btn-danger cancel-button">Cancel</button>
+					</a>
+					<button type="submit" class="btn btn-primary update-button">Update User</button>
 				</div>
 			</div>
 
