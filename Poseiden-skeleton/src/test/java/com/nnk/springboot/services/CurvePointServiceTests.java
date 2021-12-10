@@ -138,7 +138,7 @@ public class CurvePointServiceTests {
     }
     
     @Test
-    @Order(6)
+    @Order(7)
     public void deleteCurvePointServiceErrorTest() {
 	// GIVEN
 	boolean result;
