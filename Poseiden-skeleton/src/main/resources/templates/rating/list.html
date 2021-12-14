@@ -19,7 +19,7 @@
 			<div class="col-6 text-right">
 				Logged in user: <b th:inline="text" class="user">
 					[[${#httpServletRequest.remoteUser}]] </b>
-				<form th:action="@{/app-logout}" method="POST">
+				<form th:action="@{/logout}" method="POST">
 					<input type="submit" value="Logout" />
 				</form>
 			</div>
@@ -42,7 +42,7 @@
 				<p style="color: green;" th:text="${deleteSuccess}" align="center"></p>
 			</div>
 			<div th:if="${deleteError}">
-				<p style="color: green;" th:text="${deleteError}" align="center"></p>
+				<p style="color: red;" th:text="${deleteError}" align="center"></p>
 			</div>
 			</div>
 		<div class="row">
