@@ -16,9 +16,9 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    /*@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-	    message = "Le mot de passe doit contenir un minimum de 8 caractères, dont un chiffre, une majuscule et un symbole")
-   */ @Column(name = "password")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", 
+	    message = "The password must contain a minimum of 8 characters, including a number, a capital letter and a symbol")
+    @Column(name = "password")
     private String password;
 
     @NotBlank(message = "FullName is mandatory")
@@ -33,9 +33,9 @@ public class User {
 
     }
 
-    public User(Integer id, @NotBlank(message = "Username is mandatory") String username, String password,
+    public User(Integer id, @NotBlank(message = "Username is mandatory") String username,
+	    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Le mot de passe doit contenir un minimum de 8 caractères, dont un chiffre, une majuscule et un symbole") String password,
 	    @NotBlank(message = "FullName is mandatory") String fullname, Role role) {
-	super();
 	this.id = id;
 	this.username = username;
 	this.password = password;

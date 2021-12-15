@@ -1,6 +1,6 @@
 package com.nnk.springboot.services;
 
-public interface IPasswordValid {
+public interface IPasswordValidService {
     
     public boolean isPasswordValid(String password);
 

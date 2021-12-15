@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
-import com.nnk.springboot.services.IPasswordValid;
+import com.nnk.springboot.services.IPasswordValidService;
 import com.nnk.springboot.services.IUserService;
 
 @Service
@@ -24,7 +24,7 @@ public class UserServiceImpl implements IUserService {
     UserRepository userRepository;
 
     @Autowired
-    IPasswordValid passwordValid;
+    IPasswordValidService passwordValid;
 
     @Autowired
     PasswordEncoder passwordEncoder;

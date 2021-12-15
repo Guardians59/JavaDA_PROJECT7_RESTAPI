@@ -2,10 +2,10 @@ package com.nnk.springboot.services.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.nnk.springboot.services.IPasswordValid;
+import com.nnk.springboot.services.IPasswordValidService;
 
 @Service
-public class PasswordValid implements IPasswordValid{
+public class PasswordValidService implements IPasswordValidService{
 
     @Override
     public boolean isPasswordValid(String password) {

@@ -1,7 +1,6 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.services.IPasswordValid;
 import com.nnk.springboot.services.IUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,6 @@ public class UserController {
     @Autowired
     IUserService userService;
 
-    @Autowired
-    IPasswordValid passwordValid;
-
     @RequestMapping("/user/list")
     public String home(Model model) {
 	List<User> listUser = new ArrayList<>();
@@ -46,8 +42,6 @@ public class UserController {
     @PostMapping("/user/validate")
     public String validate(@ModelAttribute("user") @Valid User user, BindingResult result, Model model) {
 	boolean resultAdd;
-	boolean passwordIsValid;
-	passwordIsValid = passwordValid.isPasswordValid(user.getPassword());
 	resultAdd = userService.addUser(user);
 
 	if (result.hasErrors()) {
@@ -58,10 +52,6 @@ public class UserController {
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("success", "Successful user addition");
 	    return "user/list";
-	} else if (passwordIsValid == false) {
-	    model.addAttribute("errorPassword",
-		    "Le mot de passe doit contenir un minimum de 8 caractères, dont un chiffre, une majuscule et un symbole");
-	    return "user/add";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
@@ -79,8 +69,6 @@ public class UserController {
     @PostMapping("/user/update/{id}")
     public String updateUser(@PathVariable("id") int id,@ModelAttribute("user") @Valid User user, BindingResult result, Model model) {
 	boolean resultUpdate;
-	boolean passwordIsValid;
-	passwordIsValid = passwordValid.isPasswordValid(user.getPassword());
 	resultUpdate = userService.updateUser(id, user);
 	
 	if (result.hasErrors()) {
@@ -91,10 +79,6 @@ public class UserController {
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
 	    return "user/list";
-	} else if (passwordIsValid == false) {
-	    model.addAttribute("errorPassword",
-		    "Le mot de passe doit contenir un minimum de 8 caractères, dont un chiffre, une majuscule et un symbole");
-	    return "user/update";
 	} else {
 	    User userModel = userService.getUserById(id);
 	    model.addAttribute("user", userModel);
