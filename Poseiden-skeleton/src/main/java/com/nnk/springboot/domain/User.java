@@ -1,12 +1,26 @@
 package com.nnk.springboot.domain;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements Serializable, UserDetails{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8230681370658600779L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -81,6 +95,37 @@ public class User {
 
     public void setRole(Role role) {
 	this.role = role;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+	List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
+	list.add(new SimpleGrantedAuthority(role.getAuthority()));
+	return list;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+	// TODO Auto-generated method stub
+	return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+	// TODO Auto-generated method stub
+	return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+	// TODO Auto-generated method stub
+	return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+	// TODO Auto-generated method stub
+	return true;
     }
 
 }

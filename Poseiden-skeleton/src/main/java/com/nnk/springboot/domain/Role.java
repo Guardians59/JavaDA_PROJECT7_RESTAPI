@@ -1,6 +1,8 @@
 package com.nnk.springboot.domain;
 
-public enum Role {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
     ROLE_ADMIN("ADMIN"), ROLE_USER("USER");
     
 private final String displayValue;
@@ -13,4 +15,8 @@ private final String displayValue;
         return displayValue;
     }
 
+    @Override
+    public String getAuthority() {
+	return name();
+    }
 }

@@ -1,0 +1,31 @@
+.connection {
+	margin:auto;
+	margin-top: 20px;
+	padding-left:60px;
+}
+
+.login-texte {
+	margin-left: 30px;
+}
+
+.logout-texte {
+	margin-left: 30px;
+}
+
+.user-texte {
+	margin-left: 15px;
+	margin-right: 45px;
+}
+
+.password-texte {
+	margin-left: 15px;
+	margin-right: 10px;
+}
+
+.errorLogin-texte {
+	margin-left: 30px;
+}
+
+.login-button {
+	margin-left: 30px;
+}

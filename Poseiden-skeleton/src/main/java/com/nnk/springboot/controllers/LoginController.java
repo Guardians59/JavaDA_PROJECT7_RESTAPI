@@ -1,24 +1,26 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("app")
+//@RequestMapping("app")
 public class LoginController {
 
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("login")
-    public ModelAndView login() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("login");
-        return mav;
+    @GetMapping(value = "login")
+    public String login(Model model) {
+        User user = new User();
+        model.addAttribute("user", user);
+        return "login";
     }
 
     @GetMapping("secure/article-details")

@@ -91,7 +91,6 @@ CREATE TABLE user (
   password VARCHAR(125) NOT NULL,
   fullname VARCHAR(125) NOT NULL,
   role VARCHAR(125) NOT NULL,
-  enabled BOOLEAN DEFAULT 1,
 
   PRIMARY KEY (id)
 );

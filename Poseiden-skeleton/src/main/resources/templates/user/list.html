@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" 
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+	  xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8"/>
 <title>Home</title>
@@ -44,9 +43,7 @@
 					<th>Full Name</th>
 					<th>User Name</th>
 					<th>Role</th>
-					<div sec:authorize="hasRole('ADMIN')">
 					<th>Action</th>
-					</div>
 				</tr>
 			</thead>
 			<tbody>
@@ -56,14 +53,12 @@
 						<td th:text="${u.username}"></td>
 						<td th:text="${u.role.displayValue}"></td>
 						<td>
-						<div sec:authorize="hasRole('ADMIN')">
 						<a th:href="@{/user/edit/{id}(id=${u.id})}">
 						<button type="button" class="btn btn-primary">Edit</button>
 						</a>
 						<a th:href="@{/user/delete/{id}(id=${u.id})}">
 						<button type="button" class="btn btn-danger">Delete</button>
 						</a>
-						</div>
 						</td>
 				</tr>
 			</tbody>
