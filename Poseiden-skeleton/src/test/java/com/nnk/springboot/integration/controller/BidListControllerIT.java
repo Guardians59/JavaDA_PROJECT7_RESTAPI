@@ -37,6 +37,17 @@ public class BidListControllerIT {
     @Autowired
     BidListRepository bidListRepository;
     
+    @Autowired
+    private WebApplicationContext context;
+    
+    @BeforeEach
+    public void setup() {
+       mockMvc = MockMvcBuilders
+       .webAppContextSetup(context)
+       .apply(springSecurity())
+       .build();
+    }
+    
     @Test
     @WithUserDetails("user test")
     @DisplayName("Test de l'ajout d'un bidList")
