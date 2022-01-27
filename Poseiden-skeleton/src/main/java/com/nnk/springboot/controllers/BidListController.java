@@ -24,7 +24,7 @@ public class BidListController {
     @Autowired
     IBidListService bidListService;
 
-    @RequestMapping("/bidList/list")
+    @GetMapping("/bidList/list")
     public String home(Model model) {
 	// TODO: call service find all bids to show to the view
 	List<BidList> bidList = new ArrayList<>();
@@ -41,7 +41,7 @@ public class BidListController {
 	return "bidList/add";
     }
 
-    @PostMapping("/bidList/validate")
+    @PostMapping(value = "/bidList/validate")
     public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Model model) {
 	// TODO: check data valid and save to db, after saving return bid list
 	boolean resultAdd;
@@ -85,7 +85,7 @@ public class BidListController {
 	    listBidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", listBidList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    return "/bidList/list";
+	    return "bidList/list";
 	} else {
 	    BidList bidListModel = bidListService.getBidById(id);
 	    model.addAttribute("bidList", bidListModel);
@@ -107,13 +107,13 @@ public class BidListController {
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    return "/bidList/list";
+	    return "bidList/list";
 	} else {
 	    List<BidList> bidList = new ArrayList<>();
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    return "/bidList/list";
+	    return "bidList/list";
 	}
     }
 }

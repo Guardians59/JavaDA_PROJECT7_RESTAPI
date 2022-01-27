@@ -92,7 +92,7 @@ public class CurveController {
 	    model.addAttribute("curvePoint", curvePointModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
-	    return "curvePoint/list";
+	    return "curvePoint/update";
 	}
 
     }
@@ -108,13 +108,13 @@ public class CurveController {
 	    curvePoint = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePoint);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    return "/curvePoint/list";
+	    return "curvePoint/list";
 	} else {
 	    List<CurvePoint> curvePoint = new ArrayList<>();
 	    curvePoint = curvePointService.getAllCurvePoint();
 	    model.addAttribute("bidList", curvePoint);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    return "/curvePoint/list";
+	    return "curvePoint/list";
 	}
 
     }
