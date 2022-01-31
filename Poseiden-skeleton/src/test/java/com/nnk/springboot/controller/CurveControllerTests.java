@@ -116,8 +116,8 @@ public class CurveControllerTests {
     public void addBindingErrorCurveTest() throws Exception {
 	// GIVEN
 	CurvePoint curve = new CurvePoint();
-	curve.setCurveId(10);
-	curve.setTerm(null);
+	curve.setCurveId(0);
+	curve.setTerm(22.0);
 	curve.setValue(20.0);
 	// WHEN
 	when(curvePointService.addCurvePoint(curve)).thenReturn(false);
