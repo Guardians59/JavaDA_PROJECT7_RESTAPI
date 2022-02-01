@@ -118,9 +118,26 @@ public class RatingServiceTests {
 	assertEquals(result, false);
 	assertEquals(orderNumber, 2);
     }
-
+    
     @Test
     @Order(6)
+    public void updateFalseIdRatingServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 2;
+	Rating rating = new Rating();
+	rating.setOrderNumber(2);
+	rating.setFitchRating("error test");
+	rating.setMoodysRating("error test");
+	rating.setSandPRating("error test");
+	//WHEN
+	result = ratingService.updateRating(falseId, rating);
+	//THEN
+	assertEquals(result, false);
+    }
+
+    @Test
+    @Order(7)
     public void deleteRatingServiceTest() {
 	// GIVEN
 	boolean result;
@@ -139,7 +156,7 @@ public class RatingServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteRatingServiceErrorTest() {
 	// GIVEN
 	boolean result;
@@ -151,7 +168,7 @@ public class RatingServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getRatingByIdServiceTest() {
 	//GIVEN
 	Rating rating = new Rating();
@@ -163,7 +180,7 @@ public class RatingServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getRatingByIdServiceErrorTest() {
 	//GIVEN
 	Rating rating = new Rating();

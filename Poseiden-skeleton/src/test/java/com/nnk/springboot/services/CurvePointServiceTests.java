@@ -117,9 +117,25 @@ public class CurvePointServiceTests {
 	assertEquals(result, false);
 	assertEquals(term, 17.0);
     }
-
+    
     @Test
     @Order(6)
+    public void updateFalseIdCurvePointServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 1;
+	CurvePoint curvePoint = new CurvePoint();
+	curvePoint.setCurveId(20);
+	curvePoint.setTerm(25.0);
+	curvePoint.setValue(10.0);
+	//WHEN
+	result = curvePointService.updateCurvePoint(falseId, curvePoint);
+	//THEN
+	assertEquals(result, false);
+    }
+
+    @Test
+    @Order(7)
     public void deleteCurvePointServiceTest() {
 	// GIVEN
 	boolean result;
@@ -138,7 +154,7 @@ public class CurvePointServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteCurvePointServiceErrorTest() {
 	// GIVEN
 	boolean result;
@@ -150,7 +166,7 @@ public class CurvePointServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getCurvePointByIdServiceTest() {
 	//GIVEN
 	CurvePoint curvePoint = new CurvePoint();
@@ -161,7 +177,7 @@ public class CurvePointServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getCurvePointByIdServiceErrorTest() {
 	//GIVEN
 	CurvePoint curvePoint = new CurvePoint();

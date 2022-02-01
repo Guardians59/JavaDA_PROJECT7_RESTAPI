@@ -117,6 +117,21 @@ public class RuleNameServiceTests {
     
     @Test
     @Order(6)
+    public void updateFalseIdRuleServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 3;
+	RuleName ruleName = new RuleName();
+	ruleName.setName("error test");
+	ruleName.setDescription("error test");
+	//WHEN
+	result = ruleNameService.updateRuleName(falseId, ruleName);
+	//THEN
+	assertEquals(result, false);
+    }
+    
+    @Test
+    @Order(7)
     public void deleteRuleServiceTest() {
 	// GIVEN
 	boolean result;
@@ -135,7 +150,7 @@ public class RuleNameServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteRuleServiceErrorTest() {
 	// GIVEN
 	boolean result;
@@ -147,7 +162,7 @@ public class RuleNameServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getRuleByIdServiceTest() {
 	//GIVEN
 	RuleName ruleName = new RuleName();
@@ -159,7 +174,7 @@ public class RuleNameServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getRuleByIdServiceErrorTest() {
 	//GIVEN
 	RuleName ruleName = new RuleName();

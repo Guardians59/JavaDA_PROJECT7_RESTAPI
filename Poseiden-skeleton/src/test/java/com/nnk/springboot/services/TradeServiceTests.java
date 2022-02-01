@@ -123,6 +123,21 @@ public class TradeServiceTests {
     
     @Test
     @Order(6)
+    public void updateFalseIdTradeServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 3;
+	Trade trade = new Trade();
+	trade.setBuyQuantity(3.0);
+	trade.setAccount("error test");
+	trade.setType("error test");
+	//WHEN
+	result = tradeService.updateTrade(falseId, trade);
+	//THEN
+	assertEquals(result, false);
+    }
+    @Test
+    @Order(7)
     public void deleteTradeServiceTest() {
 	//GIVEN
 	boolean result;
@@ -141,7 +156,7 @@ public class TradeServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteTradeServiceErrorTest() {
 	//GIVEN
 	boolean result;
@@ -157,7 +172,7 @@ public class TradeServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getTradeByIdServiceTest() {
 	//GIVEN
 	Trade trade = new Trade();
@@ -169,7 +184,7 @@ public class TradeServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getTradeByIdServiceErrorTest() {
 	//GIVEN
 	Trade trade = new Trade();

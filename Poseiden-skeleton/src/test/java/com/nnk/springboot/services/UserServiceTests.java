@@ -125,6 +125,23 @@ public class UserServiceTests {
     
     @Test
     @Order(6)
+    public void updateFalseIdUserServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 4;
+	User user = new User();
+	user.setFullname("error test");
+	user.setUsername("error user test");
+	user.setPassword(passwordEncoder.encode("Azerty2&"));
+	user.setRole(Role.ROLE_USER);
+	//WHEN
+	result = userService.updateUser(falseId, user);
+	//THEN
+	assertEquals(result, false);
+    }
+    
+    @Test
+    @Order(7)
     public void deleteUserServiceTest() {
 	//GIVEN
 	boolean result;
@@ -143,7 +160,7 @@ public class UserServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteUserServiceErrorTest() {
 	//GIVEN
 	boolean result;
@@ -159,7 +176,7 @@ public class UserServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getUserByIdServiceTest() {
 	//GIVEN
 	User user = new User();
@@ -171,7 +188,7 @@ public class UserServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getUserByIdServiceErrorTest() {
 	//GIVEN
 	User user = new User();

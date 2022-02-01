@@ -115,9 +115,25 @@ public class BidListServiceTests {
 	assertEquals(result, false);
 	assertEquals(bidQuantity, 17.0);
     }
-
+    
     @Test
     @Order(6)
+    public void updateFalseIdBidServiceTest() {
+	//GIVEN
+	boolean result;
+	int falseId = 2;
+	BidList bidListUpdate = new BidList();
+	bidListUpdate.setAccount("Error test");
+	bidListUpdate.setType("Error test");
+	bidListUpdate.setBidQuantity(2.0);
+	//WHEN
+	result = bidListService.updateBidList(falseId, bidListUpdate);
+	//THEN
+	assertEquals(result, false);
+    }
+
+    @Test
+    @Order(7)
     public void deleteBidServiceTest() {
 	// GIVEN
 	boolean result;
@@ -136,7 +152,7 @@ public class BidListServiceTests {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void deleteBidServiceErrorTest() {
 	// GIVEN
 	boolean result;
@@ -148,7 +164,7 @@ public class BidListServiceTests {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void getBidByIdServiceTest() {
 	//GIVEN
 	BidList bidList = new BidList();
@@ -159,7 +175,7 @@ public class BidListServiceTests {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void getBidByIdServiceErrorTest() {
 	//GIVEN
 	BidList bidList = new BidList();
