@@ -66,9 +66,9 @@ public class RatingServiceImpl implements IRatingService{
 	searchRating = ratingRepository.findById(id);
 	
 	if (searchRating.isPresent()) {
-	    ratingUpdate = searchRating.get();
 	    if (!rating.getMoodysRating().isEmpty() && !rating.getSandPRating().isEmpty()
 		    && !rating.getFitchRating().isEmpty() && rating.getOrderNumber() > 0) {
+		ratingUpdate = searchRating.get();
 		ratingUpdate.setMoodysRating(rating.getMoodysRating());
 		ratingUpdate.setSandPRating(rating.getSandPRating());
 		ratingUpdate.setFitchRating(rating.getFitchRating());

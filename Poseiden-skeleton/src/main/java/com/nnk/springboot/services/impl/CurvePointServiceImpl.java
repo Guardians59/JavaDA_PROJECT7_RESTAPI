@@ -60,11 +60,13 @@ public class CurvePointServiceImpl implements ICurvePointService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean updateCurvePoint(int id, CurvePoint curvePoint) {
 	boolean result = false;
+	Optional<CurvePoint> searchCurvePointUpdate;
+	searchCurvePointUpdate = curvePointRepository.findById(id);
 	CurvePoint curvePointUpdate = new CurvePoint();
-	curvePointUpdate = curvePointRepository.getById(id);
 
-	if (curvePointUpdate != null) {
+	if (searchCurvePointUpdate.isPresent()) {
 	    if (curvePoint.getCurveId() > 0 && curvePoint.getTerm() > 0 && curvePoint.getValue() > 0) {
+		curvePointUpdate = searchCurvePointUpdate.get();
 		curvePointUpdate.setCurveId(curvePoint.getCurveId());
 		curvePointUpdate.setTerm(curvePoint.getTerm());
 		curvePointUpdate.setValue(curvePoint.getValue());

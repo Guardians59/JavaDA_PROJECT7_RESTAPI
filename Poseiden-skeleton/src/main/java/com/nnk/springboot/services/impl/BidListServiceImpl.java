@@ -62,12 +62,14 @@ public class BidListServiceImpl implements IBidListService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean updateBidList(int id, BidList bidList) {
 	boolean result = false;
+	Optional<BidList> searchBidListUpdate;
+	searchBidListUpdate = bidListRepository.findById(id);
 	BidList bidListUpdate = new BidList();
-	bidListUpdate = bidListRepository.getById(id);
-
-	if (bidListUpdate != null) {
+	
+	if (searchBidListUpdate.isPresent()) {
 	    if (!bidList.getAccount().isEmpty() && !bidList.getType().isEmpty() 
 		    && bidList.getBidQuantity() > 0) {
+		bidListUpdate = searchBidListUpdate.get();
 		bidListUpdate.setAccount(bidList.getAccount());
 		bidListUpdate.setType(bidList.getType());
 		bidListUpdate.setBidQuantity(bidList.getBidQuantity());

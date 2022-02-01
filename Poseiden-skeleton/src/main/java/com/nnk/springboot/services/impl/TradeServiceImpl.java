@@ -62,10 +62,10 @@ public class TradeServiceImpl implements ITradeService {
     public boolean updateTrade(int id, Trade trade) {
 	boolean result = false;
 	Optional<Trade> searchTrade = tradeRepository.findById(id);
+	Trade tradeUpdate = new Trade();
 	
 	if (searchTrade.isPresent()) {
 	    if(!trade.getAccount().isEmpty() && !trade.getType().isEmpty() && trade.getBuyQuantity() > 0) {
-		Trade tradeUpdate = new Trade();
 		tradeUpdate = searchTrade.get();
 		tradeUpdate.setAccount(trade.getAccount());
 		tradeUpdate.setType(trade.getType());

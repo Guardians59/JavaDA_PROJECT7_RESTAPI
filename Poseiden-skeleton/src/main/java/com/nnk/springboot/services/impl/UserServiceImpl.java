@@ -73,11 +73,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	boolean result = false;
 	Optional<User> searchUser = userRepository.findById(id);
 	boolean passwordIsValid = passwordValid.isPasswordValid(user.getPassword());
+	User userUpdate = new User();
 
 	if (searchUser.isPresent()) {
 	    if (!user.getUsername().isEmpty() && !user.getFullname().isEmpty() && passwordIsValid == true) {
 
-		User userUpdate = new User();
 		userUpdate = searchUser.get();
 		userUpdate.setUsername(user.getUsername());
 		userUpdate.setFullname(user.getFullname());

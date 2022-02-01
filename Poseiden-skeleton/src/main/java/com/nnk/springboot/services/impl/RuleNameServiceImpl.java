@@ -59,10 +59,10 @@ public class RuleNameServiceImpl implements IRuleNameService {
 	boolean result = false;
 	Optional<RuleName> searchRuleName;
 	searchRuleName = ruleNameRepository.findById(id);
+	RuleName ruleNameUpdate = new RuleName();
 
 	if (searchRuleName.isPresent()) {
 	    if (!ruleName.getName().isEmpty() && !ruleName.getDescription().isEmpty()) {
-		RuleName ruleNameUpdate = new RuleName();
 		ruleNameUpdate = searchRuleName.get();
 		ruleNameUpdate.setName(ruleName.getName());
 		ruleNameUpdate.setDescription(ruleName.getDescription());
