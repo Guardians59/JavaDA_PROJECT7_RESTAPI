@@ -69,11 +69,9 @@ public class TradeRepositoryTests {
 	tradeRepository.save(tradeUpdate);
 	listTrade = tradeRepository.findAll();
 	Double buyQuantity = listTrade.get(index).getBuyQuantity();
-	Timestamp timestampSave = listTrade.get(index).getRevisionDate();
 	//THEN
 	assertEquals(numberOfTrade, listTrade.size());
 	assertEquals(buyQuantity, 3.0);
-	assertEquals(timestampSave, timestamp);
     }
     
     @Test
