@@ -1,6 +1,8 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.ITradeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +27,22 @@ public class TradeController {
     @Autowired
     ITradeService tradeService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @RequestMapping("/trade/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	// TODO: find all Trade, add to model
 	List<Trade> listTrade = new ArrayList<>();
 	listTrade = tradeService.getAllTrade();
 	model.addAttribute("trade", listTrade);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "trade/list";
     }
 
@@ -41,7 +54,8 @@ public class TradeController {
     }
 
     @PostMapping("/trade/validate")
-    public String validate(@ModelAttribute("trade") @Valid Trade trade, BindingResult result, Model model) {
+    public String validate(@ModelAttribute("trade") @Valid Trade trade, BindingResult result, Principal principal,
+	    Model model) {
 	// TODO: check data valid and save to db, after saving return Trade list
 	boolean resultAdd;
 	resultAdd = tradeService.addTrade(trade);
@@ -53,6 +67,13 @@ public class TradeController {
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("success", "Successful trade addition");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "trade/list";
 	} else {
 	    model.addAttribute("error",
@@ -70,12 +91,13 @@ public class TradeController {
     }
 
     @PostMapping("/trade/update/{id}")
-    public String updateTrade(@PathVariable("id") int id, @ModelAttribute("trade") @Valid Trade trade, BindingResult result, Model model) {
+    public String updateTrade(@PathVariable("id") int id, @ModelAttribute("trade") @Valid Trade trade,
+	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update Trade and return
 	// Trade list
 	boolean resultUpdate;
 	resultUpdate = tradeService.updateTrade(id, trade);
-	
+
 	if (result.hasErrors()) {
 	    return "trade/update";
 	} else if (resultUpdate == true) {
@@ -83,6 +105,13 @@ public class TradeController {
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "trade/list";
 	} else {
 	    Trade tradeModel = tradeService.getTradeById(id);
@@ -94,22 +123,36 @@ public class TradeController {
     }
 
     @GetMapping("/trade/delete/{id}")
-    public String deleteTrade(@PathVariable("id") int id, Model model) {
+    public String deleteTrade(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: Find Trade by Id and delete the Trade, return to Trade list
 	boolean resultDelete;
 	resultDelete = tradeService.deleteTrade(id);
-	
+
 	if (resultDelete == true) {
 	    List<Trade> listTrade = new ArrayList<>();
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "trade/list";
 	} else {
 	    List<Trade> listTrade = new ArrayList<>();
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "trade/list";
 	}
     }

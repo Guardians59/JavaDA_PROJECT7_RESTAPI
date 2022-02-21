@@ -1,7 +1,9 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.services.ICurvePointService;
+import com.nnk.springboot.services.IOAuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +27,22 @@ public class CurveController {
     @Autowired
     ICurvePointService curvePointService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @RequestMapping("/curvePoint/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	// TODO: find all Curve Point, add to model
 	List<CurvePoint> curvePointList = new ArrayList<>();
 	curvePointList = curvePointService.getAllCurvePoint();
 	model.addAttribute("curvePoint", curvePointList);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "curvePoint/list";
     }
 
@@ -42,7 +55,7 @@ public class CurveController {
 
     @PostMapping("/curvePoint/validate")
     public String validate(@ModelAttribute("curvePoint") @Valid CurvePoint curvePoint, BindingResult result,
-	    Model model) {
+	    Principal principal, Model model) {
 	// TODO: check data valid and save to db, after saving return Curve list
 	boolean resultAdd;
 	resultAdd = curvePointService.addCurvePoint(curvePoint);
@@ -54,6 +67,13 @@ public class CurveController {
 	    curvePointList = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePointList);
 	    model.addAttribute("success", "Successful curve addition");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "curvePoint/list";
 	} else {
 	    model.addAttribute("error",
@@ -73,7 +93,7 @@ public class CurveController {
 
     @PostMapping("/curvePoint/update/{id}")
     public String updateBid(@PathVariable("id") int id, @ModelAttribute("curvePoint") @Valid CurvePoint curvePoint,
-	    BindingResult result, Model model) {
+	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update Curve and return
 	// Curve list
 	boolean resultUpdate;
@@ -86,6 +106,13 @@ public class CurveController {
 	    curvePointList = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePointList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "curvePoint/list";
 	} else {
 	    CurvePoint curvePointModel = curvePointService.getCurvePointById(id);
@@ -98,7 +125,7 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") int id, Model model) {
+    public String deleteBid(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: Find Curve by Id and delete the Curve, return to Curve list
 	boolean resultDelete;
 	resultDelete = curvePointService.deleteCurvePoint(id);
@@ -108,12 +135,26 @@ public class CurveController {
 	    curvePoint = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePoint);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "curvePoint/list";
 	} else {
 	    List<CurvePoint> curvePoint = new ArrayList<>();
 	    curvePoint = curvePointService.getAllCurvePoint();
 	    model.addAttribute("bidList", curvePoint);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "curvePoint/list";
 	}
 

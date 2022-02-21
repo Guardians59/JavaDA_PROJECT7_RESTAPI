@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class HomeController
 {
-	@RequestMapping("/")
+	/*@RequestMapping("/")
 	public String home(Model model)
 	{
 		return "home";
-	}
+	}*/
 
 	@RequestMapping("/admin/home")
 	public String adminHome(Model model)

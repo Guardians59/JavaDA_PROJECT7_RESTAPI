@@ -1,7 +1,9 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.services.IBidListService;
+import com.nnk.springboot.services.IOAuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,8 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +25,23 @@ public class BidListController {
     @Autowired
     IBidListService bidListService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @GetMapping("/bidList/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	// TODO: call service find all bids to show to the view
 	List<BidList> bidList = new ArrayList<>();
 	bidList = bidListService.getAllBidList();
 	model.addAttribute("bidList", bidList);
+	LoggedUsername logged = new LoggedUsername();
+
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "bidList/list";
     }
 
@@ -42,7 +54,8 @@ public class BidListController {
     }
 
     @PostMapping(value = "/bidList/validate")
-    public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Model model) {
+    public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Principal principal,
+	    Model model) {
 	// TODO: check data valid and save to db, after saving return bid list
 	boolean resultAdd;
 	resultAdd = bidListService.addBidList(bid);
@@ -54,6 +67,13 @@ public class BidListController {
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("success", "Successful bid addition");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "bidList/list";
 	} else {
 	    model.addAttribute("error",
@@ -72,7 +92,7 @@ public class BidListController {
 
     @PostMapping("/bidList/update/{bidListId}")
     public String updateBid(@PathVariable("bidListId") int id, @ModelAttribute("bidList") @Valid BidList bidList,
-	    BindingResult result, Model model) {
+	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update Bid and return
 	// list Bid
 	boolean resultUpdate;
@@ -85,6 +105,13 @@ public class BidListController {
 	    listBidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", listBidList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "bidList/list";
 	} else {
 	    BidList bidListModel = bidListService.getBidById(id);
@@ -97,7 +124,7 @@ public class BidListController {
     }
 
     @GetMapping("/bidList/delete/{bidListId}")
-    public String deleteBid(@PathVariable("bidListId") Integer id, Model model) {
+    public String deleteBid(@PathVariable("bidListId") Integer id, Principal principal, Model model) {
 	// TODO: Find Bid by Id and delete the bid, return to Bid list
 	boolean resultDelete;
 	resultDelete = bidListService.deleteBidList(id);
@@ -107,12 +134,26 @@ public class BidListController {
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "bidList/list";
 	} else {
 	    List<BidList> bidList = new ArrayList<>();
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "bidList/list";
 	}
     }

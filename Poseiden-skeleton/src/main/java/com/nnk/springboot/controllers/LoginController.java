@@ -2,15 +2,10 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
-
-import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -19,6 +14,7 @@ public class LoginController {
 
     @Autowired
     private UserRepository userRepository;
+    
 
     @GetMapping(value = "login")
     public String login(Model model) {
@@ -26,13 +22,6 @@ public class LoginController {
         model.addAttribute("user", user);
         return "login";
     }
-    
-   /* @RequestMapping("/*")
-    public String getUserInfo(Principal user) {
-	StringBuffer userInfo = new StringBuffer();
-	
-	return user.toString();
-    }*/
 
     @GetMapping("secure/article-details")
     public ModelAndView getAllUserArticles() {

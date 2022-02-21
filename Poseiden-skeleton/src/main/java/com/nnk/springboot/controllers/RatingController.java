@@ -1,6 +1,8 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IRatingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +27,22 @@ public class RatingController {
     @Autowired
     IRatingService ratingService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @RequestMapping("/rating/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	// TODO: find all Rating, add to model
 	List<Rating> ratingList = new ArrayList<>();
 	ratingList = ratingService.getAllRating();
 	model.addAttribute("rating", ratingList);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "rating/list";
     }
 
@@ -41,7 +54,8 @@ public class RatingController {
     }
 
     @PostMapping("/rating/validate")
-    public String validate(@Valid @ModelAttribute("rating") Rating rating, BindingResult result, Model model) {
+    public String validate(@Valid @ModelAttribute("rating") Rating rating, BindingResult result, Principal principal,
+	    Model model) {
 	// TODO: check data valid and save to db, after saving return Rating list
 	boolean resultAdd;
 	resultAdd = ratingService.addRating(rating);
@@ -53,9 +67,17 @@ public class RatingController {
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("success", "Successful rating addition");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "rating/list";
 	} else {
-	    model.addAttribute("error", "An error has occured, check that you have filled in all the information fields and try again");
+	    model.addAttribute("error",
+		    "An error has occured, check that you have filled in all the information fields and try again");
 	    return "rating/add";
 	}
     }
@@ -70,12 +92,13 @@ public class RatingController {
     }
 
     @PostMapping("/rating/update/{id}")
-    public String updateRating(@PathVariable("id") int id, @ModelAttribute("rating") @Valid Rating rating, BindingResult result, Model model) {
+    public String updateRating(@PathVariable("id") int id, @ModelAttribute("rating") @Valid Rating rating,
+	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update Rating and
 	// return Rating list
 	boolean resultUpdate;
 	resultUpdate = ratingService.updateRating(id, rating);
-	
+
 	if (result.hasErrors()) {
 	    return "rating/update";
 	} else if (resultUpdate == true) {
@@ -83,6 +106,13 @@ public class RatingController {
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "rating/list";
 	} else {
 	    Rating ratingModel = ratingService.getRatingById(id);
@@ -94,21 +124,35 @@ public class RatingController {
     }
 
     @GetMapping("/rating/delete/{id}")
-    public String deleteRating(@PathVariable("id") int id, Model model) {
+    public String deleteRating(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: Find Rating by Id and delete the Rating, return to Rating list
 	boolean resultDelete;
 	resultDelete = ratingService.deleteRating(id);
-	
+
 	if (resultDelete == true) {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	} else {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	}
 	return "rating/list";
     }

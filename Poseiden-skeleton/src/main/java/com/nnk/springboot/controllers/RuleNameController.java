@@ -1,6 +1,8 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IRuleNameService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +27,22 @@ public class RuleNameController {
     @Autowired
     IRuleNameService ruleNameService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @RequestMapping("/ruleName/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	// TODO: find all RuleName, add to model
 	List<RuleName> listRuleName = new ArrayList<>();
 	listRuleName = ruleNameService.getAllRuleName();
 	model.addAttribute("ruleName", listRuleName);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "ruleName/list";
     }
 
@@ -41,7 +54,8 @@ public class RuleNameController {
     }
 
     @PostMapping("/ruleName/validate")
-    public String validate(@ModelAttribute("ruleName") @Valid RuleName ruleName, BindingResult result, Model model) {
+    public String validate(@ModelAttribute("ruleName") @Valid RuleName ruleName, BindingResult result,
+	    Principal principal, Model model) {
 	// TODO: check data valid and save to db, after saving return RuleName list
 	boolean resultAdd;
 	resultAdd = ruleNameService.addRuleName(ruleName);
@@ -53,6 +67,13 @@ public class RuleNameController {
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("success", "Successful rule addition");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "ruleName/list";
 	} else {
 	    model.addAttribute("error",
@@ -72,7 +93,7 @@ public class RuleNameController {
 
     @PostMapping("/ruleName/update/{id}")
     public String updateRuleName(@PathVariable("id") Integer id, @ModelAttribute("ruleName") @Valid RuleName ruleName,
-	    BindingResult result, Model model) {
+	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update RuleName and
 	// return RuleName list
 	boolean resultUpdate;
@@ -85,6 +106,13 @@ public class RuleNameController {
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "ruleName/list";
 	} else {
 	    RuleName ruleNameModel = ruleNameService.getRuleNameById(id);
@@ -96,7 +124,7 @@ public class RuleNameController {
     }
 
     @GetMapping("/ruleName/delete/{id}")
-    public String deleteRuleName(@PathVariable("id") Integer id, Model model) {
+    public String deleteRuleName(@PathVariable("id") Integer id, Principal principal, Model model) {
 	// TODO: Find RuleName by Id and delete the RuleName, return to Rule list
 	boolean resultDelete;
 	resultDelete = ruleNameService.deleteRuleName(id);
@@ -106,12 +134,26 @@ public class RuleNameController {
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "ruleName/list";
 	} else {
 	    List<RuleName> listRuleName = new ArrayList<>();
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "ruleName/list";
 	}
     }

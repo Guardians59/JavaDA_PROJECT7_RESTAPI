@@ -1,6 +1,8 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +27,22 @@ public class UserController {
     @Autowired
     IUserService userService;
 
+    @Autowired
+    IOAuthService oauthService;
+
     @RequestMapping("/user/list")
-    public String home(Model model) {
+    public String home(Principal principal, Model model) {
 	List<User> listUser = new ArrayList<>();
 	listUser = userService.getAllUser();
 	model.addAttribute("user", listUser);
+	LoggedUsername logged = new LoggedUsername();
+
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	model.addAttribute("loggedusername", logged);
 	return "user/list";
     }
 
@@ -40,7 +54,8 @@ public class UserController {
     }
 
     @PostMapping("/user/validate")
-    public String validate(@ModelAttribute("user") @Valid User user, BindingResult result, Model model) {
+    public String validate(@ModelAttribute("user") @Valid User user, BindingResult result, Principal principal,
+	    Model model) {
 	boolean resultAdd;
 	resultAdd = userService.addUser(user);
 
@@ -51,6 +66,14 @@ public class UserController {
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("success", "Successful user addition");
+	    LoggedUsername logged = new LoggedUsername();
+
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "user/list";
 	} else {
 	    model.addAttribute("error",
@@ -67,10 +90,11 @@ public class UserController {
     }
 
     @PostMapping("/user/update/{id}")
-    public String updateUser(@PathVariable("id") int id,@ModelAttribute("user") @Valid User user, BindingResult result, Model model) {
+    public String updateUser(@PathVariable("id") int id, @ModelAttribute("user") @Valid User user, BindingResult result,
+	    Principal principal, Model model) {
 	boolean resultUpdate;
 	resultUpdate = userService.updateUser(id, user);
-	
+
 	if (result.hasErrors()) {
 	    return "user/update";
 	} else if (resultUpdate == true) {
@@ -78,6 +102,14 @@ public class UserController {
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "user/list";
 	} else {
 	    User userModel = userService.getUserById(id);
@@ -89,21 +121,37 @@ public class UserController {
     }
 
     @GetMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable("id") int id, Model model) {
+    public String deleteUser(@PathVariable("id") int id, Principal principal, Model model) {
 	boolean resultDelete;
 	resultDelete = userService.deleteUser(id);
-	
+
 	if (resultDelete == true) {
 	    List<User> listUser = new ArrayList<>();
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
+	    LoggedUsername logged = new LoggedUsername();
+
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "user/list";
 	} else {
 	    List<User> listUser = new ArrayList<>();
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("deleteError", "An error has occured please try again");
+	    LoggedUsername logged = new LoggedUsername();
+
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    model.addAttribute("loggedusername", logged);
 	    return "user/list";
 	}
     }
