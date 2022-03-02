@@ -19,6 +19,14 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+/**
+ * La classe BidListController est le controller qui permet de gérer les URL
+ * bidList, afin d'afficher la liste des Entités BidList, ajouter,modifier et
+ * supprimer un BidList.
+ * 
+ * @author Dylan
+ *
+ */
 @Controller
 public class BidListController {
 
@@ -28,9 +36,23 @@ public class BidListController {
     @Autowired
     IOAuthService oauthService;
 
+    /**
+     * La méthode home permet d'afficher la liste des BidList enregistrés en base
+     * de données.
+     * @param principal les informations de l'utilisateur connécté.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/list.
+     */
     @GetMapping("/bidList/list")
     public String home(Principal principal, Model model) {
-	// TODO: call service find all bids to show to the view
+	/*
+	 * On récupère la liste des BidList via le service bidListService, on
+	 * indique le model bidList avec l'attribut correspondant qui va permettre
+	 * à thymeleaf d'afficher celle-ci.
+	 * On récupère l'username de l'utilisateur connecté avec l'objet LoggedUsername
+	 * qui utilise le service oauthService.
+	 * Nous renvoyons la vue bidList/list.
+	 */
 	List<BidList> bidList = new ArrayList<>();
 	bidList = bidListService.getAllBidList();
 	model.addAttribute("bidList", bidList);
@@ -44,7 +66,12 @@ public class BidListController {
 	model.addAttribute("loggedusername", logged);
 	return "bidList/list";
     }
-
+    
+    /**
+     * La méthode addBidForm permet d'afficher le formulaire d'ajout d'un BidList.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/add.
+     */
     @GetMapping("/bidList/add")
     public String addBidForm(Model model) {
 	BidList bidList = new BidList();
@@ -53,13 +80,36 @@ public class BidListController {
 	return "bidList/add";
     }
 
+    /**
+     * La méthode validate permet de poster le formulaire d'ajout d'un BidList.
+     * @param bid le model de l'entité BidList à sauvegarder en base de données.
+     * @param result binding result afin de vérifier la conformité des informations
+     * du BidList.
+     * @param principal les informations de l'utilisateur connecté.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/list si l'ajout est un succès, bidList/add si
+     * une erreur est rencontrée.
+     */
     @PostMapping(value = "/bidList/validate")
-    public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Principal principal,
-	    Model model) {
+    public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result,
+	    Principal principal, Model model) {
 	// TODO: check data valid and save to db, after saving return bid list
 	boolean resultAdd;
 	resultAdd = bidListService.addBidList(bid);
-
+	
+	/*
+	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
+	 * auquel cas nous renvoyons la page bidList/add avec le message d'erreur du
+	 * binding correspondant à la donnée erronée.
+	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
+	 * BidList renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
+	 * la page bidList/list avec un message de succès pour indiquer que la sauvegarde
+	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
+	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
+	 * pour confirmer l'ajout du BidList alors nous renvoyons la page bidList/add
+	 * avec un message d'erreur.
+	 */
 	if (result.hasErrors()) {
 	    return "bidList/add";
 	} else if (resultAdd == true) {
@@ -82,6 +132,13 @@ public class BidListController {
 	}
     }
 
+    /**
+     * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
+     * d'un BidList.
+     * @param id l'id du BidList que l'on souhaite modifier.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/update.
+     */
     @GetMapping("/bidList/edit/{bidListId}")
     public String showUpdateForm(@PathVariable("bidListId") int id, Model model) {
 	// TODO: get Bid by Id and to model then show to the form
@@ -90,14 +147,37 @@ public class BidListController {
 	return "bidList/update";
     }
 
+    /**
+     * La méthode updateBid permet de poster la mis à jour d'un BidList.
+     * @param id l'id du BidList à modifier.
+     * @param bidList le model de l'entité BidList.
+     * @param result binding result afin de vérifier la conformité des informations
+     * du BidList.
+     * @param principal les informations de l'utilisateur connecté.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/list si la mis à jour est validée, bidList/update
+     * si une erreur est rencontrée.
+     */
     @PostMapping("/bidList/update/{bidListId}")
     public String updateBid(@PathVariable("bidListId") int id, @ModelAttribute("bidList") @Valid BidList bidList,
 	    BindingResult result, Principal principal, Model model) {
 	// TODO: check required fields, if valid call service to update Bid and return
-	// list Bid
 	boolean resultUpdate;
 	resultUpdate = bidListService.updateBidList(id, bidList);
 
+	/*
+	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
+	 * auquel cas nous renvoyons la page bidList/update avec le message d'erreur du
+	 * binding correspondant à la donnée erronée.
+	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
+	 * BidList renvoit true pour confirmer la modification de celui-ci, nous renvoyons
+	 * la page bidList/list avec un message de succès pour indiquer que la mis à jour
+	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
+	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
+	 * pour confirmer la mis à jour du BidList alors nous renvoyons la page
+	 * bidList/update avec un message d'erreur.
+	 */
 	if (result.hasErrors()) {
 	    return "bidList/update";
 	} else if (resultUpdate == true) {
@@ -123,12 +203,29 @@ public class BidListController {
 
     }
 
+    /**
+     * La méthode deleteBid permet de supprimer un BidList depuis la liste.
+     * @param id l'id du BidList à supprimer.
+     * @param principal les informations de l'utilisateur connecté.
+     * @param model pour définir les attributs nécéssaires à la vue.
+     * @return String la vue bidList/list.
+     */
     @GetMapping("/bidList/delete/{bidListId}")
     public String deleteBid(@PathVariable("bidListId") Integer id, Principal principal, Model model) {
 	// TODO: Find Bid by Id and delete the bid, return to Bid list
 	boolean resultDelete;
 	resultDelete = bidListService.deleteBidList(id);
 
+	/*
+	 * Si le service deleteBidList nous renvoit true, alors nous affichons la
+	 * liste mis à jour avec un message de succès pour indiquer la validation
+	 * de la suppression du BidList, on récupère également l'username de l'utilisateur
+	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * Si le service deleteBidList nous renvoit false, alors nous affichons un
+	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
+	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
+	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 */
 	if (resultDelete == true) {
 	    List<BidList> bidList = new ArrayList<>();
 	    bidList = bidListService.getAllBidList();

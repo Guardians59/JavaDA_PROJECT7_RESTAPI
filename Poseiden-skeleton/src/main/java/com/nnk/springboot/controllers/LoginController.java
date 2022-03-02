@@ -12,8 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 //@RequestMapping("app")
 public class LoginController {
 
-    @Autowired
-    private UserRepository userRepository;
+    /*@Autowired
+    private UserRepository userRepository;*/
     
 
     @GetMapping(value = "login")
@@ -23,7 +23,7 @@ public class LoginController {
         return "login";
     }
 
-    @GetMapping("secure/article-details")
+    /*@GetMapping("secure/article-details")
     public ModelAndView getAllUserArticles() {
         ModelAndView mav = new ModelAndView();
         mav.addObject("users", userRepository.findAll());
@@ -38,5 +38,5 @@ public class LoginController {
         mav.addObject("errorMsg", errorMessage);
         mav.setViewName("403");
         return mav;
-    }
+    }*/
 }
