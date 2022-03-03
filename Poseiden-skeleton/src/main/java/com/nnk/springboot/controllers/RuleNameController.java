@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IRuleNameService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +38,8 @@ public class RuleNameController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(RuleNameController.class);
 
     /**
      * La méthode home permet d'afficher la liste des RuleName enregistrés en base
@@ -64,18 +68,29 @@ public class RuleNameController {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the endpoint '/ruleName/list'");
 	return "ruleName/list";
     }
 
     /**
      * La méthode addRuleForm permet d'afficher le formulaire d'ajout d'un RuleName.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue ruleName/add.
      */
     @GetMapping("/ruleName/add")
-    public String addRuleForm(Model model) {
+    public String addRuleForm(Principal principal, Model model) {
 	RuleName ruleName = new RuleName();
 	model.addAttribute("ruleName", ruleName);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/ruleName/add'");
 	return "ruleName/add";
     }
 
@@ -97,36 +112,43 @@ public class RuleNameController {
 	resultAdd = ruleNameService.addRuleName(ruleName);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page ruleName/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * RuleName renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page ruleName/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du RuleName alors nous renvoyons la page ruleName/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/ruleName/validate'");
 	    return "ruleName/add";
 	} else if (resultAdd == true) {
 	    List<RuleName> listRuleName = new ArrayList<>();
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("success", "Successful rule addition");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new ruleName from the endpoint post '/ruleName/validate'");
 	    return "ruleName/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/ruleName/validate'");
 	    return "ruleName/add";
 	}
 
@@ -136,14 +158,23 @@ public class RuleNameController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un RuleName.
      * @param id l'id du RuleName que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue ruleName/update.
      */
     @GetMapping("/ruleName/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
+    public String showUpdateForm(@PathVariable("id") Integer id, Principal principal, Model model) {
 	// TODO: get RuleName by Id and to model then show to the form
 	RuleName ruleName = ruleNameService.getRuleNameById(id);
 	model.addAttribute("ruleName", ruleName);
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    logger.info("The user " + logged.getUsername() + 
+			" logs in to the update form from endpoint '/ruleName/edit/" + id + "'");
 	return "ruleName/update";
     }
 
@@ -166,38 +197,45 @@ public class RuleNameController {
 	resultUpdate = ruleNameService.updateRuleName(id, ruleName);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page ruleName/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * RuleName renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page ruleName/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du RuleName alors nous renvoyons la page
 	 * ruleName/update avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/ruleName/update/" + id + "'");
 	    return "ruleName/update";
 	} else if (resultUpdate == true) {
 	    List<RuleName> listRuleName = new ArrayList<>();
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated ruleName from endpoint post '/ruleName/update/" + id + "'");
 	    return "ruleName/list";
 	} else {
 	    RuleName ruleNameModel = ruleNameService.getRuleNameById(id);
 	    model.addAttribute("ruleName", ruleNameModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/ruleName/update/" + id + "'");
 	    return "ruleName/update";
 	}
     }
@@ -216,40 +254,38 @@ public class RuleNameController {
 	resultDelete = ruleNameService.deleteRuleName(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteRuleName nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du RuleName, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du RuleName.
 	 * Si le service deleteRuleName nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
-	if (resultDelete == true) {
-	    List<RuleName> listRuleName = new ArrayList<>();
-	    listRuleName = ruleNameService.getAllRuleName();
-	    model.addAttribute("ruleName", listRuleName);
-	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
+	LoggedUsername logged = new LoggedUsername();
 	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
 		logged = oauthService.getOauthUsername(principal);
 	    } else {
 		logged = oauthService.getUsername(principal);
 	    }
+	if (resultDelete == true) {
+	    List<RuleName> listRuleName = new ArrayList<>();
+	    listRuleName = ruleNameService.getAllRuleName();
+	    model.addAttribute("ruleName", listRuleName);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a ruleName from the endpoint '/ruleName/delete/" + id + "'");
 	    return "ruleName/list";
 	} else {
 	    List<RuleName> listRuleName = new ArrayList<>();
 	    listRuleName = ruleNameService.getAllRuleName();
 	    model.addAttribute("ruleName", listRuleName);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/ruleName/delete/" + id + "'");
 	    return "ruleName/list";
 	}
     }

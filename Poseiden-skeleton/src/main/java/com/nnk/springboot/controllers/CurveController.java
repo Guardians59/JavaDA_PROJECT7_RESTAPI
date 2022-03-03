@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.services.ICurvePointService;
 import com.nnk.springboot.services.IOAuthService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +39,8 @@ public class CurveController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(CurveController.class);
 
     /**
      * La méthode home permet d'afficher la liste des CurvePoint enregistrés en base
@@ -65,18 +69,29 @@ public class CurveController {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the endpoint '/curvePoint/list'");
 	return "curvePoint/list";
     }
 
     /**
      * La méthode addBidForm permet d'afficher le formulaire d'ajout d'un CurvePoint.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue curvePoint/add.
      */
     @GetMapping("/curvePoint/add")
-    public String addBidForm(Model model) {
+    public String addBidForm(Principal principal, Model model) {
 	CurvePoint curvePoint = new CurvePoint();
 	model.addAttribute("curvePoint", curvePoint);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/curvePoint/add'");
 	return "curvePoint/add";
     }
 
@@ -98,36 +113,43 @@ public class CurveController {
 	resultAdd = curvePointService.addCurvePoint(curvePoint);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page curvePoint/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * CurvePoint renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page curvePoint/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du CurvePoint alors nous renvoyons la page curvePoint/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/curvePoint/validate'");
 	    return "curvePoint/add";
 	} else if (resultAdd == true) {
 	    List<CurvePoint> curvePointList = new ArrayList<>();
 	    curvePointList = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePointList);
 	    model.addAttribute("success", "Successful curve addition");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new curvePoint from the endpoint post '/curvePoint/validate'");
 	    return "curvePoint/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/curvePoint/validate'");
 	    return "curvePoint/add";
 	}
     }
@@ -136,15 +158,24 @@ public class CurveController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un CurvePoint.
      * @param id l'id du BidList que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue curvePoint/update.
      */
     @GetMapping("/curvePoint/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") int id, Model model) {
+    public String showUpdateForm(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: get CurvePoint by Id and to model then show to the form
 	CurvePoint curvePoint = new CurvePoint();
 	curvePoint = curvePointService.getCurvePointById(id);
 	model.addAttribute("curvePoint", curvePoint);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the update form from endpoint '/curvePoint/edit/" + id + "'");
 	return "curvePoint/update";
     }
 
@@ -167,38 +198,45 @@ public class CurveController {
 	resultUpdate = curvePointService.updateCurvePoint(id, curvePoint);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page curvePoint/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * CurvePoint renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page curvePoint/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du CurvePoint alors nous renvoyons la page
 	 * curvePoint/update avec un message d'erreur.
 	 */
+	 LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/curvePoint/update/" + id + "'");
 	    return "curvePoint/update";
 	} else if (resultUpdate == true) {
 	    List<CurvePoint> curvePointList = new ArrayList<>();
 	    curvePointList = curvePointService.getAllCurvePoint();
 	    model.addAttribute("curvePoint", curvePointList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated curvePoint from endpoint post '/curvePoint/update/" + id + "'");
 	    return "curvePoint/list";
 	} else {
 	    CurvePoint curvePointModel = curvePointService.getCurvePointById(id);
 	    model.addAttribute("curvePoint", curvePointModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/curvePoint/update/" + id + "'");
 	    return "curvePoint/update";
 	}
 
@@ -218,40 +256,38 @@ public class CurveController {
 	resultDelete = curvePointService.deleteCurvePoint(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteCurvePoint nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du CurvePoint, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du CurvePoint.
 	 * Si le service deleteCurvePoint nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
-	if (resultDelete == true) {
-	    List<CurvePoint> curvePoint = new ArrayList<>();
-	    curvePoint = curvePointService.getAllCurvePoint();
-	    model.addAttribute("curvePoint", curvePoint);
-	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
+	LoggedUsername logged = new LoggedUsername();
 	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
 		logged = oauthService.getOauthUsername(principal);
 	    } else {
 		logged = oauthService.getUsername(principal);
 	    }
+	if (resultDelete == true) {
+	    List<CurvePoint> curvePoint = new ArrayList<>();
+	    curvePoint = curvePointService.getAllCurvePoint();
+	    model.addAttribute("curvePoint", curvePoint);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a curvePoint from the endpoint '/curvePoint/delete/" + id + "'");
 	    return "curvePoint/list";
 	} else {
 	    List<CurvePoint> curvePoint = new ArrayList<>();
 	    curvePoint = curvePointService.getAllCurvePoint();
 	    model.addAttribute("bidList", curvePoint);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/curvePoint/delete/" + id + "'");
 	    return "curvePoint/list";
 	}
 

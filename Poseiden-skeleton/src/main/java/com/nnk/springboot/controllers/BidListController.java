@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.LoggedUsername;
 import com.nnk.springboot.services.IBidListService;
 import com.nnk.springboot.services.IOAuthService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,8 @@ public class BidListController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(BidListController.class);
 
     /**
      * La méthode home permet d'afficher la liste des BidList enregistrés en base
@@ -57,26 +61,34 @@ public class BidListController {
 	bidList = bidListService.getAllBidList();
 	model.addAttribute("bidList", bidList);
 	LoggedUsername logged = new LoggedUsername();
-
 	if (oauthService.getOauthUsername(principal).getUsername() != null) {
 	    logged = oauthService.getOauthUsername(principal);
 	} else {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + " logs in to the endpoint '/bidList/list'");
 	return "bidList/list";
     }
     
     /**
      * La méthode addBidForm permet d'afficher le formulaire d'ajout d'un BidList.
      * @param model pour définir les attributs nécéssaires à la vue.
+     * @param principal les informations de l'utilisateur connecté.
      * @return String la vue bidList/add.
      */
     @GetMapping("/bidList/add")
-    public String addBidForm(Model model) {
+    public String addBidForm(Principal principal, Model model) {
 	BidList bidList = new BidList();
 	model.addAttribute("bidList", bidList);
-
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/bidList/add'");
 	return "bidList/add";
     }
 
@@ -98,36 +110,43 @@ public class BidListController {
 	resultAdd = bidListService.addBidList(bid);
 	
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page bidList/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * BidList renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page bidList/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du BidList alors nous renvoyons la page bidList/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/bidList/validate'");
 	    return "bidList/add";
 	} else if (resultAdd == true) {
 	    List<BidList> bidList = new ArrayList<>();
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("success", "Successful bid addition");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new bidList from the endpoint post '/bidList/validate'");
 	    return "bidList/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/bidList/validate'");
 	    return "bidList/add";
 	}
     }
@@ -136,14 +155,23 @@ public class BidListController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un BidList.
      * @param id l'id du BidList que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue bidList/update.
      */
     @GetMapping("/bidList/edit/{bidListId}")
-    public String showUpdateForm(@PathVariable("bidListId") int id, Model model) {
+    public String showUpdateForm(@PathVariable("bidListId") int id, Principal principal, Model model) {
 	// TODO: get Bid by Id and to model then show to the form
 	BidList bidList = bidListService.getBidById(id);
 	model.addAttribute("bidList", bidList);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the update form from endpoint '/bidList/edit/" + id + "'");
 	return "bidList/update";
     }
 
@@ -166,38 +194,45 @@ public class BidListController {
 	resultUpdate = bidListService.updateBidList(id, bidList);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page bidList/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * BidList renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page bidList/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du BidList alors nous renvoyons la page
 	 * bidList/update avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/bidList/update/" + id + "'");
 	    return "bidList/update";
 	} else if (resultUpdate == true) {
 	    List<BidList> listBidList = new ArrayList<>();
 	    listBidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", listBidList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated bidList from endpoint post '/bidList/update/" + id + "'");
 	    return "bidList/list";
 	} else {
 	    BidList bidListModel = bidListService.getBidById(id);
 	    model.addAttribute("bidList", bidListModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/bidList/update/" + id + "'");
 	    return "bidList/update";
 	}
 
@@ -217,40 +252,38 @@ public class BidListController {
 	resultDelete = bidListService.deleteBidList(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteBidList nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du BidList, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du BidList.
 	 * Si le service deleteBidList nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
-	if (resultDelete == true) {
-	    List<BidList> bidList = new ArrayList<>();
-	    bidList = bidListService.getAllBidList();
-	    model.addAttribute("bidList", bidList);
-	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
+	 LoggedUsername logged = new LoggedUsername();
 	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
 		logged = oauthService.getOauthUsername(principal);
 	    } else {
 		logged = oauthService.getUsername(principal);
 	    }
+	if (resultDelete == true) {
+	    List<BidList> bidList = new ArrayList<>();
+	    bidList = bidListService.getAllBidList();
+	    model.addAttribute("bidList", bidList);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a bidList from the endpoint '/bidList/delete/" + id + "'");
 	    return "bidList/list";
 	} else {
 	    List<BidList> bidList = new ArrayList<>();
 	    bidList = bidListService.getAllBidList();
 	    model.addAttribute("bidList", bidList);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/bidList/delete/" + id + "'");
 	    return "bidList/list";
 	}
     }

@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.ITradeService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +38,8 @@ public class TradeController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(TradeController.class);
 
     /**
      * La méthode home permet d'afficher la liste des Trade enregistrés en base
@@ -64,18 +68,29 @@ public class TradeController {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the endpoint '/trade/list'");
 	return "trade/list";
     }
 
     /**
      * La méthode addTradeForm permet d'afficher le formulaire d'ajout d'un Trade.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue trade/add.
      */
     @GetMapping("/trade/add")
-    public String addTradeForm(Model model) {
+    public String addTradeForm(Principal principal, Model model) {
 	Trade newTrade = new Trade();
 	model.addAttribute("trade", newTrade);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/trade/add'");
 	return "trade/add";
     }
 
@@ -97,36 +112,43 @@ public class TradeController {
 	resultAdd = tradeService.addTrade(trade);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page trade/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * Trade renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page trade/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du Trade alors nous renvoyons la page trade/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/trade/validate'");
 	    return "trade/add";
 	} else if (resultAdd == true) {
 	    List<Trade> listTrade = new ArrayList<>();
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("success", "Successful trade addition");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new trade from the endpoint post '/trade/validate'");
 	    return "trade/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/trade/validate'");
 	    return "trade/add";
 	}
     }
@@ -135,14 +157,23 @@ public class TradeController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un Trade.
      * @param id l'id du Trade que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue trade/update.
      */
     @GetMapping("/trade/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") int id, Model model) {
+    public String showUpdateForm(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: get Trade by Id and to model then show to the form
 	Trade trade = tradeService.getTradeById(id);
 	model.addAttribute("trade", trade);
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    logger.info("The user " + logged.getUsername() + 
+			" logs in to the update form from endpoint '/trade/edit/" + id + "'");
 	return "trade/update";
     }
 
@@ -165,38 +196,45 @@ public class TradeController {
 	resultUpdate = tradeService.updateTrade(id, trade);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page trade/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * Trade renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page trade/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du Trade alors nous renvoyons la page
 	 * trade/update avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/trade/update/" + id + "'");
 	    return "trade/update";
 	} else if (resultUpdate == true) {
 	    List<Trade> listTrade = new ArrayList<>();
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated ruleName from endpoint post '/trade/update/" + id + "'");
 	    return "trade/list";
 	} else {
 	    Trade tradeModel = tradeService.getTradeById(id);
 	    model.addAttribute("trade", tradeModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/trade/update/" + id + "'");
 	    return "trade/update";
 	}
     }
@@ -215,40 +253,38 @@ public class TradeController {
 	resultDelete = tradeService.deleteTrade(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteTrade nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du Trade, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du Trade.
 	 * Si le service deleteTrade nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
-	if (resultDelete == true) {
-	    List<Trade> listTrade = new ArrayList<>();
-	    listTrade = tradeService.getAllTrade();
-	    model.addAttribute("trade", listTrade);
-	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
+	LoggedUsername logged = new LoggedUsername();
 	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
 		logged = oauthService.getOauthUsername(principal);
 	    } else {
 		logged = oauthService.getUsername(principal);
 	    }
+	if (resultDelete == true) {
+	    List<Trade> listTrade = new ArrayList<>();
+	    listTrade = tradeService.getAllTrade();
+	    model.addAttribute("trade", listTrade);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a trade from the endpoint '/trade/delete/" + id + "'");
 	    return "trade/list";
 	} else {
 	    List<Trade> listTrade = new ArrayList<>();
 	    listTrade = tradeService.getAllTrade();
 	    model.addAttribute("trade", listTrade);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/trade/delete/" + id + "'");
 	    return "trade/list";
 	}
     }

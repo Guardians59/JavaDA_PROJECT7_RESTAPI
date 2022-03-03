@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.User;
 import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IUserService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +38,8 @@ public class UserController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(UserController.class);
 
     /**
      * La méthode home permet d'afficher la liste des User enregistrés en base
@@ -58,25 +62,35 @@ public class UserController {
 	listUser = userService.getAllUser();
 	model.addAttribute("user", listUser);
 	LoggedUsername logged = new LoggedUsername();
-
 	if (oauthService.getOauthUsername(principal).getUsername() != null) {
 	    logged = oauthService.getOauthUsername(principal);
 	} else {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the endpoint '/user/list'");
 	return "user/list";
     }
 
     /**
      * La méthode addUserForm permet d'afficher le formulaire d'ajout d'un User.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue user/add.
      */
     @GetMapping("/user/add")
-    public String addUserForm(Model model) {
+    public String addUserForm(Principal principal, Model model) {
 	User user = new User();
 	model.addAttribute("user", user);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/user/add'");
 	return "user/add";
     }
 
@@ -97,37 +111,43 @@ public class UserController {
 	resultAdd = userService.addUser(user);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page user/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * User renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page user/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du User alors nous renvoyons la page user/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/user/validate'");
 	    return "user/add";
 	} else if (resultAdd == true) {
 	    List<User> listUser = new ArrayList<>();
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("success", "Successful user addition");
-	    LoggedUsername logged = new LoggedUsername();
-
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new user from the endpoint post '/user/validate'");
 	    return "user/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/user/validate'");
 	    return "user/add";
 	}
     }
@@ -136,13 +156,22 @@ public class UserController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un User.
      * @param id l'id du User que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue user/update.
      */
     @GetMapping("/user/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") int id, Model model) {
+    public String showUpdateForm(@PathVariable("id") int id, Principal principal, Model model) {
 	User user = userService.getUserById(id);
 	model.addAttribute("user", user);
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    logger.info("The user " + logged.getUsername() + 
+			" logs in to the update form from endpoint '/user/edit/" + id + "'");
 	return "user/update";
     }
 
@@ -164,39 +193,45 @@ public class UserController {
 	resultUpdate = userService.updateUser(id, user);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page user/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * User renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page user/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du User alors nous renvoyons la page
 	 * user/update avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/user/update/" + id + "'");
 	    return "user/update";
 	} else if (resultUpdate == true) {
 	    List<User> listUser = new ArrayList<>();
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated user from endpoint post '/user/update/" + id + "'");
 	    return "user/list";
 	} else {
 	    User userModel = userService.getUserById(id);
 	    model.addAttribute("user", userModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/user/update/" + id + "'");
 	    return "user/update";
 	}
     }
@@ -214,42 +249,38 @@ public class UserController {
 	resultDelete = userService.deleteUser(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteUser nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du User, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du User.
 	 * Si le service deleteUser nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
-	if (resultDelete == true) {
-	    List<User> listUser = new ArrayList<>();
-	    listUser = userService.getAllUser();
-	    model.addAttribute("user", listUser);
-	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-
+	LoggedUsername logged = new LoggedUsername();
 	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
 		logged = oauthService.getOauthUsername(principal);
 	    } else {
 		logged = oauthService.getUsername(principal);
 	    }
+	if (resultDelete == true) {
+	    List<User> listUser = new ArrayList<>();
+	    listUser = userService.getAllUser();
+	    model.addAttribute("user", listUser);
+	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a trade from the endpoint '/user/delete/" + id + "'");
 	    return "user/list";
 	} else {
 	    List<User> listUser = new ArrayList<>();
 	    listUser = userService.getAllUser();
 	    model.addAttribute("user", listUser);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/user/delete/" + id + "'");
 	    return "user/list";
 	}
     }

@@ -5,6 +5,8 @@ import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.services.IOAuthService;
 import com.nnk.springboot.services.IRatingService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +39,8 @@ public class RatingController {
 
     @Autowired
     IOAuthService oauthService;
+    
+    private static Logger logger = LogManager.getLogger(RatingController.class);
 
     /**
      * La méthode home permet d'afficher la liste des Rating enregistrés en base
@@ -65,18 +69,29 @@ public class RatingController {
 	    logged = oauthService.getUsername(principal);
 	}
 	model.addAttribute("loggedusername", logged);
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the endpoint '/rating/list'");
 	return "rating/list";
     }
 
     /**
-     * La méthode addRatingForm permet d'afficher le formulaire d'ajout d'un Rating.
+     * La méthode addRatingForm permet d'afficher le formulaire d'ajout d'un Rating.ù
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue rating/add.
      */
     @GetMapping("/rating/add")
-    public String addRatingForm(Model model) {
+    public String addRatingForm(Principal principal, Model model) {
 	Rating rating = new Rating();
 	model.addAttribute("rating", rating);
+	LoggedUsername logged = new LoggedUsername();
+	if (oauthService.getOauthUsername(principal).getUsername() != null) {
+	    logged = oauthService.getOauthUsername(principal);
+	} else {
+	    logged = oauthService.getUsername(principal);
+	}
+	logger.info("The user " + logged.getUsername() + 
+		" logs in to the add form from endpoint '/rating/add'");
 	return "rating/add";
     }
 
@@ -98,36 +113,43 @@ public class RatingController {
 	resultAdd = ratingService.addRating(rating);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page rating/add avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service d'ajout d'un
 	 * Rating renvoit true pour confirmer l'ajout de celui-ci, nous renvoyons
 	 * la page rating/list avec un message de succès pour indiquer que la sauvegarde
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer l'ajout du Rating alors nous renvoyons la page rating/add
 	 * avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/rating/validate'");
 	    return "rating/add";
 	} else if (resultAdd == true) {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("success", "Successful rating addition");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just added a new rating from the endpoint post '/rating/validate'");
 	    return "rating/list";
 	} else {
 	    model.addAttribute("error",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/rating/validate'");
 	    return "rating/add";
 	}
     }
@@ -136,15 +158,24 @@ public class RatingController {
      * La méthode showUpdateForm permet d'afficher le formulaire de mis à jour
      * d'un Rating.
      * @param id l'id du Rating que l'on souhaite modifier.
+     * @param principal les informations de l'utilisateur connecté.
      * @param model pour définir les attributs nécéssaires à la vue.
      * @return String la vue rating/update.
      */
     @GetMapping("/rating/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") int id, Model model) {
+    public String showUpdateForm(@PathVariable("id") int id, Principal principal, Model model) {
 	// TODO: get Rating by Id and to model then show to the form
 	Rating rating = new Rating();
 	rating = ratingService.getRatingById(id);
 	model.addAttribute("rating", rating);
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
+	    logger.info("The user " + logged.getUsername() + 
+			" logs in to the update form from endpoint '/rating/edit/" + id + "'");
 	return "rating/update";
     }
 
@@ -167,38 +198,45 @@ public class RatingController {
 	resultUpdate = ratingService.updateRating(id, rating);
 	
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * On vérifie avec le BindingResult que les données de l'entité soient valides,
 	 * auquel cas nous renvoyons la page rating/update avec le message d'erreur du
 	 * binding correspondant à la donnée erronée.
 	 * Si le binding ne contient pas d'erreur et que le service de mis à jour d'un
 	 * Rating renvoit true pour confirmer la modification de celui-ci, nous renvoyons
 	 * la page rating/list avec un message de succès pour indiquer que la mis à jour
-	 * c'est bien exécutée, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * c'est bien exécutée.
 	 * Si le binding ne renvoit pas d'erreur et que le boolean ne renvoit pas true
 	 * pour confirmer la mis à jour du Rating alors nous renvoyons la page
 	 * rating/update avec un message d'erreur.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (result.hasErrors()) {
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/rating/update/" + id + "'");
 	    return "rating/update";
 	} else if (resultUpdate == true) {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("updateSuccess", "The update was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " just updated rating from endpoint post '/rating/update/" + id + "'");
 	    return "rating/list";
 	} else {
 	    Rating ratingModel = ratingService.getRatingById(id);
 	    model.addAttribute("rating", ratingModel);
 	    model.addAttribute("updateError",
 		    "An error has occured, check that you have filled in all the information fields and try again");
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/rating/update/" + id + "'");
 	    return "rating/update";
 	}
     }
@@ -217,39 +255,37 @@ public class RatingController {
 	resultDelete = ratingService.deleteRating(id);
 
 	/*
+	 * On récupère l'username de l'utilisateur connecté avec l'objet
+	 * LoggedUsername qui utilise le service oauthService.
 	 * Si le service deleteRating nous renvoit true, alors nous affichons la
 	 * liste mis à jour avec un message de succès pour indiquer la validation
-	 * de la suppression du Rating, on récupère également l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * de la suppression du Rating.
 	 * Si le service deleteRating nous renvoit false, alors nous affichons un
 	 * message d'erreur au dessus de la liste afin d'indiquer que la suppression
-	 * n'est pas validée, la encore on récupère l'username de l'utilisateur
-	 * connecté avec l'objet LoggedUsername qui utilise le service oauthService.
+	 * n'est pas validée.
 	 */
+	LoggedUsername logged = new LoggedUsername();
+	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
+		logged = oauthService.getOauthUsername(principal);
+	    } else {
+		logged = oauthService.getUsername(principal);
+	    }
 	if (resultDelete == true) {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has deleted a rating from the endpoint '/rating/delete/" + id + "'");
 	} else {
 	    List<Rating> ratingList = new ArrayList<>();
 	    ratingList = ratingService.getAllRating();
 	    model.addAttribute("rating", ratingList);
 	    model.addAttribute("deleteError", "An error has occured please try again");
-	    LoggedUsername logged = new LoggedUsername();
-	    if (oauthService.getOauthUsername(principal).getUsername() != null) {
-		logged = oauthService.getOauthUsername(principal);
-	    } else {
-		logged = oauthService.getUsername(principal);
-	    }
 	    model.addAttribute("loggedusername", logged);
+	    logger.info("The user " + logged.getUsername() + 
+		    " has encounter an error in the endpoint '/rating/delete/" + id + "'");
 	}
 	return "rating/list";
     }
