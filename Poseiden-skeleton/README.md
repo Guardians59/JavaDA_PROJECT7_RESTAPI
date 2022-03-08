@@ -29,3 +29,7 @@
 ## Security
 1. Create user service to load user from  database and place in package com.nnk.springboot.services
 2. Add configuration class and place in package com.nnk.springboot.config
+
+## Before Starting the Project
+1. Go to the properties file
+2. Add your github client id and secret where indicated
