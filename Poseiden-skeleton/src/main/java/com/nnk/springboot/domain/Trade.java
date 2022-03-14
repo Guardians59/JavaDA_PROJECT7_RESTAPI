@@ -23,7 +23,7 @@ public class Trade {
     @Column(name = "type")
     private String type;
 
-    @Positive
+    @Positive (message = "Must be positive")
     @Column(name = "buy_quantity")
     private Double buyQuantity;
 
@@ -82,11 +82,11 @@ public class Trade {
 
     }
 
-    public Trade(int tradeId, String account, String type, Double buyQuantity, Double sellQuantity, Double buyPrice,
+    public Trade(int tradeId, @NotBlank String account, @NotBlank String type,
+	    @Positive(message = "Must be positive") Double buyQuantity, Double sellQuantity, Double buyPrice,
 	    Double sellPrice, String benchmark, Timestamp tradeDate, String security, String status, String trader,
 	    String book, String creationName, Timestamp creationDate, String revisionName, Timestamp revisionDate,
 	    String dealName, String dealType, String sourceListId, String side) {
-
 	this.tradeId = tradeId;
 	this.account = account;
 	this.type = type;

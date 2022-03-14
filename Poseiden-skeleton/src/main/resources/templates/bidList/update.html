@@ -54,6 +54,8 @@
 					class="form-control number-custom" placeholder="Bid Quantity"
 					aria-label="number" aria-describedby="addon-wrapping">
 			 </div>
+			 <p th:if="${#fields.hasErrors('bidQuantity')}"
+						th:class="${#fields.hasErrors('bidQuantity')}? error">Must be positive</p>
 			 </div>
 			 
 			 <div class="row">

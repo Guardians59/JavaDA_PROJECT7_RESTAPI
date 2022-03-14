@@ -43,6 +43,8 @@
 							placeholder="Term" aria-label="number"
 							aria-describedby="addon-wrapping">
 					</div>
+					<p th:if="${#fields.hasErrors('term')}"
+						th:class="${#fields.hasErrors('term')}? error">Must be positive</p>
 				</div>
 
 				<div class="form-group">
@@ -52,6 +54,8 @@
 							class="form-control number-custom" placeholder="Value"
 							aria-label="number" aria-describedby="addon-wrapping">
 					</div>
+					<p th:if="${#fields.hasErrors('value')}"
+						th:class="${#fields.hasErrors('value')}? error">Must be positive</p>
 				</div>
 
 				<div class="row">

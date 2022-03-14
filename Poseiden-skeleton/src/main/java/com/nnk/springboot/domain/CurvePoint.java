@@ -22,9 +22,11 @@ public class CurvePoint {
     @Column(name = "as_of_date")
     private Timestamp asOfDate;
 
+    @Positive(message = "Must be positive")
     @Column(name = "term")
     private Double term;
 
+    @Positive(message = "Must be positive")
     @Column(name = "value")
     private Double value;
 
@@ -34,10 +36,9 @@ public class CurvePoint {
     public CurvePoint() {
 
     }
-
-    public CurvePoint(int id, @NotNull(message = "Must not be null") int curveId, Timestamp asOfDate, Double term,
-	    Double value, Timestamp creationDate) {
-
+    public CurvePoint(int id, @Positive(message = "Must not be null") int curveId, Timestamp asOfDate,
+	    @Positive(message = "Must be positive") Double term, @Positive(message = "Must be positive") Double value,
+	    Timestamp creationDate) {
 	this.id = id;
 	this.curveId = curveId;
 	this.asOfDate = asOfDate;
