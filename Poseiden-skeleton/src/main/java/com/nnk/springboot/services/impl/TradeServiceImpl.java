@@ -60,7 +60,7 @@ public class TradeServiceImpl implements ITradeService {
 	 * 
 	 */
 	if (!newTrade.getAccount().isEmpty() && !newTrade.getType().isEmpty() 
-		&& newTrade.getBuyQuantity() > 0) {
+		&& (newTrade.getBuyQuantity() != null && newTrade.getBuyQuantity() > 0)) {
 
 	    Trade trade = new Trade();
 	    trade.setAccount(newTrade.getAccount());
@@ -98,7 +98,7 @@ public class TradeServiceImpl implements ITradeService {
 	 */
 	if (searchTrade.isPresent()) {
 	    if(!trade.getAccount().isEmpty() && !trade.getType().isEmpty() 
-		    && trade.getBuyQuantity() > 0) {
+		    && (trade.getBuyQuantity() != null && trade.getBuyQuantity() > 0)) {
 		tradeUpdate = searchTrade.get();
 		tradeUpdate.setAccount(trade.getAccount());
 		tradeUpdate.setType(trade.getType());

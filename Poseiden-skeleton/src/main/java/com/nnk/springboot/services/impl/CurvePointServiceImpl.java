@@ -61,8 +61,8 @@ public class CurvePointServiceImpl implements ICurvePointService {
 	 * lors de la vérification des informations alors le boolean reste false.
 	 * 
 	 */
-	if (newCurvePoint.getCurveId() > 0 && newCurvePoint.getTerm() > 0
-		&& newCurvePoint.getValue() > 0) {
+	if (newCurvePoint.getCurveId() > 0 && (newCurvePoint.getTerm() != null && newCurvePoint.getTerm() > 0)
+		&& (newCurvePoint.getValue() != null && newCurvePoint.getValue() > 0)) {
 	    CurvePoint curvePoint = new CurvePoint();
 	    curvePoint.setCurveId(newCurvePoint.getCurveId());
 	    curvePoint.setTerm(newCurvePoint.getTerm());
@@ -99,8 +99,8 @@ public class CurvePointServiceImpl implements ICurvePointService {
 	 * la mis à jour n'est pas validée.
 	 */
 	if (searchCurvePointUpdate.isPresent()) {
-	    if (curvePoint.getCurveId() > 0 && curvePoint.getTerm() > 0 
-		    && curvePoint.getValue() > 0) {
+	    if (curvePoint.getCurveId() > 0 && (curvePoint.getTerm() != null && curvePoint.getTerm() > 0) 
+		    && (curvePoint.getValue() != null && curvePoint.getValue() > 0)) {
 		curvePointUpdate = searchCurvePointUpdate.get();
 		curvePointUpdate.setCurveId(curvePoint.getCurveId());
 		curvePointUpdate.setTerm(curvePoint.getTerm());

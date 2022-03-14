@@ -60,7 +60,7 @@ public class BidListServiceImpl implements IBidListService {
 	 * 
 	 */
 	if (!newBidList.getAccount().isEmpty() && !newBidList.getType().isEmpty()
-		&& newBidList.getBidQuantity() > 0) {
+		&& (newBidList.getBidQuantity() != null && newBidList.getBidQuantity() > 0)) {
 
 	    BidList bidListAdd = new BidList();
 	    bidListAdd.setAccount(newBidList.getAccount());
@@ -99,7 +99,7 @@ public class BidListServiceImpl implements IBidListService {
 	 */
 	if (searchBidListUpdate.isPresent()) {
 	    if (!bidList.getAccount().isEmpty() && !bidList.getType().isEmpty() 
-		    && bidList.getBidQuantity() > 0) {
+		    && (bidList.getBidQuantity() != null && bidList.getBidQuantity() > 0)) {
 		bidListUpdate = searchBidListUpdate.get();
 		bidListUpdate.setAccount(bidList.getAccount());
 		bidListUpdate.setType(bidList.getType());
