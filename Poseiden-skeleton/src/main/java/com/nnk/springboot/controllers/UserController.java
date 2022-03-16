@@ -271,7 +271,7 @@ public class UserController {
 	    model.addAttribute("deleteSuccess", "The delete was executed successfully");
 	    model.addAttribute("loggedusername", logged);
 	    logger.info("The user " + logged.getUsername() + 
-		    " has deleted a trade from the endpoint '/user/delete/" + id + "'");
+		    " has deleted a user from the endpoint '/user/delete/" + id + "'");
 	    return "user/list";
 	} else {
 	    List<User> listUser = new ArrayList<>();
